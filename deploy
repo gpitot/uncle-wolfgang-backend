@@ -1,0 +1,21 @@
+#!/bin/bash
+GREEN='\033[1;32m'
+NC='\033[0m' # No Color
+
+
+TEMPLATE="https://stash.9msn.net/scm/psw/000-easy-website-template.git"
+# Get todays date
+NOW=$(date +"%d-%m-%Y")
+echo $NOW
+if [ ! -d "dist" ]; then
+    git clone $TEMPLATE --branch dist dist
+    echo NO DIST EXISTS
+    echo Please enter a remote repository
+    read REMOTE
+    cd dist && git remote set-url origin $REMOTE
+    cd ..
+fi
+
+npx babel ./src --out-dir dist/src
+cd dist && git add . && git commit -m "Released at $NOW" && git push --force origin head
+exit 0
