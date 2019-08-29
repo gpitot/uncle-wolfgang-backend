@@ -4,6 +4,9 @@
 ## build folder
 dist
 build
+dist_old_v
+temp
+produles.txt
 
 ### macOS ###
 # General
