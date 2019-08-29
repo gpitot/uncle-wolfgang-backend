@@ -8,7 +8,7 @@ APP_IMAGE = $(REGISTRY)/$(PROJECT)/$(PROJECT):$(VERSION)
 BUILD_IMAGE = $(REGISTRY)/nec-network/network-ci:$(NODE_VERSION)
 DEPLOY_IMAGE = docker-registry.mi9cdn.com:5000/mi9-docker-deploy:latest
 DEPLOY_STRAT = deploy
-AMI_STACK = 64bit Amazon Linux 2018.03 v4.8.1 running Node.js
+AMI_STACK = 64bit Amazon Linux 2018.03 v4.10.1 running Node.js
 WHERE = test
 
 
