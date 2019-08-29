@@ -28,8 +28,9 @@
     "@babel/preset-env": "^7.4.4",
     "eslint": "^5.16.0",
     "eslint-plugin-import": "^2.17.2",
-    "nodemon": "^1.19.0",
     "gulp": "^4.0.2",
-    "gulp-zip": "^5.0.0"
+    "gulp-zip": "^5.0.0",
+    "nodemon": "^1.19.0",
+    "yargs": "^14.0.0"
   }
 }
