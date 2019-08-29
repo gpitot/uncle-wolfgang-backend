@@ -5,10 +5,10 @@
   "scripts": {
     "start": "npm run prod",
     "dev": "NODE_ENV=development npm run watch ./src/bin/www",
-    "prod": "NODE_ENV=production node ./dist/bin/www",
-    "build": "npm run clean && babel ./src --out-dir dist/src",
+    "prod": "NODE_ENV=production node ./src/bin/www",
+    "build": "npm run clean && babel ./src --out-dir src/src",
     "deploy": "npm run clean && bash deploy",
-    "clean": "rimraf dist",
+    "clean": "rimraf src",
     "watch": "nodemon --config ./nodemon.json --"
   },
   "dependencies": {
