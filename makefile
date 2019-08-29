@@ -70,3 +70,54 @@ package: clean deps
 	sudo chown -R $(shell whoami) $(BUILD_DIR)
 	chmod -R 755 $(OUT_DIR)/*.zip
 .PHONY: package
+
+cnameSwap:
+	cp $(PWD)/$(KEY_DIR)/$(AWS_KEYS)  $(PWD)/$(ARTIFACTS_DIR)/
+	docker run -t \
+		--rm \
+		-v $(PWD)/$(ARTIFACTS_DIR):/app/artifacts \
+		-w /app \
+		$(DEPLOY_IMAGE) \
+		sh -c "make cnameSwap \
+			AWS_KEY_FILE=artifacts/$(AWS_KEYS) \
+			PROJECT=$(PROJECT) \
+			SOURCE_CNAME=$(SOURCE_CNAME) \
+			TARGET_CNAME=$(TARGET_CNAME) \
+			ENVIRONMENT=$(ENVIRONMENT)"
+	rm -rf  $(PWD)/$(ARTIFACTS_DIR)/$(AWS_KEYS)
+.PHONY: cnameSwap
+
+
+cleanAppVersions: $(OUT_DIR)/$(PROJECT)-$(VERSION).zip
+	cp -rf $(PWD)/$(KEY_DIR)/$(AWS_KEYS) $(PWD)/$(OUT_DIR)/$(AWS_KEYS)
+	docker pull $(DEPLOY_IMAGE)
+	docker run --rm -t -v $(PWD)/$(OUT_DIR):/app/artifacts -w /app $(DEPLOY_IMAGE) \
+		sh -c "make cleanApplicationVersions \
+		PROJECT=$(PROJECT) \
+		AWS_KEY_FILE=artifacts/$(AWS_KEYS)"
+.PHONY: cleanAppVersions
+
+awsKeys:
+	rm -rf $(KEY_DIR)
+	mkdir -p $(KEY_DIR)
+	docker pull $(CREDS_IMAGE)
+	docker run -v $(PWD)/$(KEY_DIR):/opt/app/creds -e account_name=$(TARGET_ACCOUNT) $(CREDS_IMAGE)
+.PHONY: awsKeys
+
+
+terminateOldEnv:
+	rm -rf $(PWD)/artifacts
+	mkdir -p $(PWD)/artifacts
+	sudo cp $(PWD)/$(KEY_DIR)/$(AWS_KEYS) $(PWD)/artifacts
+	docker run -t -v $(PWD)/artifacts:/app/artifacts -w /app $(DEPLOY_IMAGE) \
+			sh -c "make terminateOldEnv \
+				PROJECT=$(PROJECT) \
+				AWS_KEY_FILE=artifacts/$(AWS_KEYS) \
+				ENVIRONMENT=$(ENVIRONMENT)"
+.PHONY: terminateOldEnv
+
+copy: clean
+	if [ -d "deploy-config/$(PROJECT)" ]; then cp -rf $(PWD)/deploy-config/$(PROJECT)/beanstalk $(PWD)/$(OUT_DIR)/beanstalk ; \
+	else echo "ok"; cp -rf $(PWD)/deploy-config/default/beanstalk $(PWD)/$(OUT_DIR)/beanstalk ; \
+	fi
+.PHONY: copy
