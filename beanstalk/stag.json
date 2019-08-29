@@ -1,0 +1,112 @@
+[
+    {
+      "Namespace": "aws:elasticbeanstalk:application:environment",
+      "OptionName": "APP_ENV",
+      "Value": "stag"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:application:environment",
+      "OptionName": "NODE_ENV",
+      "Value": "production"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:application:environment",
+      "OptionName": "ELASTIC_LOGGING_URL",
+      "Value": "vpc-infra-elk-dev-4o3jhbu7f5d45a7jdz5aslsiqy.ap-southeast-2.es.amazonaws.com"
+    },  
+    {
+      "Namespace": "aws:autoscaling:launchconfiguration",
+      "OptionName": "InstanceType",
+      "Value": "t2.small"
+    },
+    {
+      "Namespace": "aws:autoscaling:launchconfiguration",
+      "OptionName": "EC2KeyName",
+      "Value": "Mi9ProdStudiosSydney"
+    },
+    {
+      "Namespace": "aws:autoscaling:launchconfiguration",
+      "OptionName": "IamInstanceProfile",
+      "Value": "StudiosProdProfiles-standarddeploy-1C9C3TAHB1OWX"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:environment",
+      "OptionName": "ServiceRole",
+      "Value": "Mi9Studios/InstanceProfile/eb-service-role"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:healthreporting:system",
+      "OptionName": "SystemType",
+      "Value": "enhanced"
+    },
+    {
+      "Namespace": "aws:ec2:vpc",
+      "OptionName": "VPCId",
+      "Value": "vpc-d0a9e9b5"
+    },
+    {
+      "Namespace": "aws:ec2:vpc",
+      "OptionName": "Subnets",
+      "Value": "subnet-1a9dc16d,subnet-7d437518"
+    },
+    {
+      "Namespace": "aws:ec2:vpc",
+      "OptionName": "ELBSubnets",
+      "Value": "subnet-199dc16e,subnet-7c437519"
+    },
+    {
+      "Namespace": "aws:ec2:vpc",
+      "OptionName": "ELBScheme",
+      "Value": "external"
+    },
+    {
+      "Namespace": "aws:autoscaling:launchconfiguration",
+      "OptionName": "SecurityGroups",
+      "Value": "sg-e6bf7482"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:application:environment",
+      "OptionName": "BILLING_PRODUCT",
+      "Value": "Studios"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:application:environment",
+      "OptionName": "OPS_BILLING_ENV",
+      "Value": "staging"
+    },
+    {
+      "Namespace": "aws:elasticbeanstalk:application:environment",
+      "OptionName": "OPS_UPTIME_PROFILE",
+      "Value": "0000-2400x7"
+    },
+    {
+      "Namespace": "aws:autoscaling:asg",
+      "OptionName": "MinSize",
+      "Value": "1"
+    },
+    {
+      "Namespace": "aws:autoscaling:asg",
+      "OptionName": "MaxSize",
+      "Value": "2"
+    },
+    {
+      "Namespace": "aws:autoscaling:asg",
+      "OptionName": "Availability Zones",
+      "Value": "Any 2"
+    },
+    {
+      "Namespace": "aws:elb:loadbalancer",
+      "OptionName": "LoadBalancerHTTPSPort",
+      "Value": "443"
+    },
+    {
+      "Namespace": "aws:elb:loadbalancer",
+      "OptionName": "LoadBalancerHTTPPort",
+      "Value": "OFF"
+    },
+    {
+      "Namespace": "aws:elb:loadbalancer",
+      "OptionName": "SSLCertificateId",
+      "Value": "arn:aws:acm:ap-southeast-2:407297532013:certificate/cd6b72c5-897b-4497-950f-50692477b782"
+    }
+  ]
