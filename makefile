@@ -12,9 +12,6 @@ AMI_STACK = 64bit Amazon Linux 2018.03 v4.8.1 running Node.js
 WHERE = test
 
 
-deploy: deploy-new
-.PHONY: deploy
-
 deploy-new:
 	mkdir -p $(PWD)/$(OUT_DIR)/beanstalk
 	mkdir -p $(PWD)/$(OUT_DIR)/$(KEY_DIR)
@@ -68,7 +65,7 @@ package: clean deps
       -v $(PWD):/opt/app \
       -w /opt/app \
       node:$(NODE_VERSION) \
-      sh -c "PATH=$$PATH:/opt/app/node_modules/.bin babel ./src --out-dir $(BUILD_DIR)/src && PATH=$$PATH:/opt/app/node_modules/.bin gulp --no-color --app_version=$(VERSION) --site=$(PROJECT)" 
+      sh -c "PATH=$$PATH:/opt/app/node_modules/.bin babel ./src --out-dir $(BUILD_DIR)/src && PATH=$$PATH:/opt/app/node_modules/.bin gulp --no-color --VERSION $(VERSION) --PROJECT $(PROJECT)" 
 	sudo chown -R $(shell whoami) $(OUT_DIR)
 	sudo chown -R $(shell whoami) $(BUILD_DIR)
 	chmod -R 755 $(OUT_DIR)/*.zip
