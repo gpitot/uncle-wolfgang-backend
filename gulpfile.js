@@ -21,6 +21,7 @@ gulp.task('build', function() {
     //copy package.json to build folder
     return gulp.src([
         'package.json',
+        'nginx-default.conf'
         ])
         .pipe(gulp.dest('build/'));
 })
