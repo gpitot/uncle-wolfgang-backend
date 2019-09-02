@@ -66,7 +66,7 @@ package: clean deps
       -v $(PWD):/opt/app \
       -w /opt/app \
       node:$(NODE_VERSION) \
-      sh -c "PATH=$$PATH:/opt/app/node_modules/.bin babel ./src --out-dir $(BUILD_DIR)/src && PATH=$$PATH:/opt/app/node_modules/.bin gulp --no-color --VERSION $(VERSION) --PROJECT $(PROJECT)" 
+      sh -c "PATH=$$PATH:/opt/app/node_modules/.bin babel ./src --out-dir $(BUILD_DIR)/src --copy-files && PATH=$$PATH:/opt/app/node_modules/.bin gulp --no-color --VERSION $(VERSION) --PROJECT $(PROJECT)" 
 	sudo chown -R $(shell whoami) $(OUT_DIR)
 	sudo chown -R $(shell whoami) $(BUILD_DIR)
 	chmod -R 755 $(OUT_DIR)/*.zip
