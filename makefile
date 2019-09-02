@@ -73,10 +73,10 @@ package: clean deps
 .PHONY: package
 
 cnameSwap:
-	cp $(PWD)/$(KEY_DIR)/$(AWS_KEYS)  $(PWD)/$(ARTIFACTS_DIR)/
+	cp $(PWD)/$(KEY_DIR)/$(AWS_KEYS)  $(PWD)/$(OUT_DIR)/
 	docker run -t \
 		--rm \
-		-v $(PWD)/$(ARTIFACTS_DIR):/app/artifacts \
+		-v $(PWD)/$(OUT_DIR):/app/artifacts \
 		-w /app \
 		$(DEPLOY_IMAGE) \
 		sh -c "make cnameSwap \
@@ -85,7 +85,7 @@ cnameSwap:
 			SOURCE_CNAME=$(SOURCE_CNAME) \
 			TARGET_CNAME=$(TARGET_CNAME) \
 			ENVIRONMENT=$(ENVIRONMENT)"
-	rm -rf  $(PWD)/$(ARTIFACTS_DIR)/$(AWS_KEYS)
+	rm -rf  $(PWD)/$(OUT_DIR)/$(AWS_KEYS)
 .PHONY: cnameSwap
 
 
