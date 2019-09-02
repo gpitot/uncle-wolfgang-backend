@@ -7,6 +7,7 @@ REGISTRY = docker-registry.mi9cdn.com:5000
 APP_IMAGE = $(REGISTRY)/$(PROJECT)/$(PROJECT):$(VERSION)
 BUILD_IMAGE = $(REGISTRY)/nec-network/alpine-node:$(NODE_VERSION)
 DEPLOY_IMAGE = docker-registry.mi9cdn.com:5000/mi9-docker-deploy:latest
+CREDS_IMAGE = $(REGISTRY)/techops/sts-cross-account-creds
 DEPLOY_STRAT = deploy
 AMI_STACK = 64bit Amazon Linux 2018.03 v4.10.1 running Node.js
 WHERE = test
