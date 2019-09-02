@@ -20,8 +20,7 @@ gulp.task('ebextensions', function() {
 gulp.task('build', function() {
     //copy package.json to build folder
     return gulp.src([
-        'package.json',
-        'nginx-default.conf'
+        'package.json'
         ])
         .pipe(gulp.dest('build/'));
 })
