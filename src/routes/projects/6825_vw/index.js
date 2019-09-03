@@ -43,11 +43,13 @@ const codes = [
 
 /* GET home page. */
 router.post('/', function(req, res, next) {
-    const userCode = req.body.code;
-    if (!userCode) {
+    
+    //console.log(req.body);
+    if (!req.body.code) {
         res.status(200);
-        res.json({success:false});
+        return res.json({success:false});
     } 
+    const userCode = req.body.code;
 
     const currentDate = new Date();
 

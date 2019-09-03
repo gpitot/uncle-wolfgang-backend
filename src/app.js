@@ -21,7 +21,7 @@ app.use(cors())
 
 
 app.get('/', (req, res) => {
-    res.send('powered api');
+    res.send('powered api v.00001');
 })
 
 app.use('/api', indexRouter);
