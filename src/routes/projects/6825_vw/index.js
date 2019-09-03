@@ -8,7 +8,15 @@ var router = express.Router();
 //check code word given against code word of day
 const codes = [
     {
-        date : 'August 21 2019',
+        date : 'September 03 2019',
+        code : 'TEST'
+    },
+    {
+        date : 'September 04 2019',
+        code : 'TEST'
+    },
+    {
+        date : 'September 05 2019',
         code : 'TEST'
     },
     {
