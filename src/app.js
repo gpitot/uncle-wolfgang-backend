@@ -15,9 +15,9 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use(express.static(path.join(__dirname, '../public')));
-//app.options(/\.nine\.com\.au$/, cors())
-app.use(cors())
+
+app.options(/\.nine\.com\.au$/, cors())
+//app.use(cors())
 
 
 app.get('/', (req, res) => {
