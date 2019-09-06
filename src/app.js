@@ -16,8 +16,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.options(/\.nine\.com\.au$/, cors())
-//app.use(cors())
+//app.options(/\.nine\.com\.au$/, cors())
+app.use(cors())
 
 
 app.get('/', (req, res) => {
