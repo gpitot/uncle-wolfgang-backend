@@ -16,8 +16,8 @@ const codes = [
         code : 'TEST'
     },
     {
-        date : 'September 05 2019',
-        code : 'TEST'
+        date : 'September 06 2019',
+        code : 'ALL STARS'
     },
     {
         date : 'September 08 2019',
