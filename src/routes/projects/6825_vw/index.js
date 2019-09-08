@@ -4,7 +4,7 @@ import express from 'express';
 var router = express.Router();
 
 const dayMSeconds = 86400000; //miliseconds in a day
-const startTime = 1567906500000; //11.40 am CHANGE THIS LATER
+const startTime = 1567933140000; //6.59 pm sunday 8th
 //check code word given against code word of day
 const codes = [
     {
