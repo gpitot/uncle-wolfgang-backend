@@ -3,40 +3,28 @@ import express from 'express';
 
 var router = express.Router();
 
-
-
+const dayMSeconds = 86400000; //miliseconds in a day
+const startTime = 1567906800000; //11.40 am CHANGE THIS LATER
 //check code word given against code word of day
 const codes = [
     {
-        date : 'September 03 2019',
-        code : 'TEST'
-    },
-    {
-        date : 'September 04 2019',
-        code : 'TEST'
-    },
-    {
-        date : 'September 06 2019',
+        date : startTime,
         code : 'ALL STARS'
     },
     {
-        date : 'September 08 2019',
-        code : 'ALL STARS'
-    },
-    {
-        date : 'September 09 2019',
+        date : startTime + (dayMSeconds * 1),
         code : 'ENSUITE'
     },
     {
-        date : 'September 10 2019',
+        date : startTime + (dayMSeconds * 2),
         code : 'TERRACE'
     },
     {
-        date : 'September 11 2019',
+        date : startTime + (dayMSeconds * 3),
         code : 'CHALLENGE'
     },
     {
-        date : 'September 12 2019',
+        date : startTime + (dayMSeconds * 4),
         code : 'TOOLS DOWN'
     }
 ]
@@ -51,17 +39,13 @@ router.post('/', function(req, res, next) {
     } 
     const userCode = req.body.code;
 
-    const currentDate = new Date();
-
-    for (let i=0; i<codes.length; i+=1) {
+    const currentDate = new Date().getTime();
+    console.log(currentDate);
+    for (let i=0; i<codes.length - 1; i+=1) {
         const {date, code} = codes[i];
-        const dateCheck = new Date(date);
+
         if (
-            currentDate.getDate() ===  dateCheck.getDate()
-            &&
-            currentDate.getMonth() ===  dateCheck.getMonth()
-            &&
-            currentDate.getYear() ===  dateCheck.getYear()
+            currentDate > date && currentDate < codes[i+1].date
         ) {
             if (code.toLowerCase() === userCode.toLowerCase()) {
                 res.status(200);
@@ -73,6 +57,19 @@ router.post('/', function(req, res, next) {
         }
     }
 
+    //check last days code
+    const {date, code} = codes[codes.length-1];
+    if (
+        currentDate > date
+    ) {
+        if (code.toLowerCase() === userCode.toLowerCase()) {
+            res.status(200);
+            return res.json({success: true});
+        } else {
+            res.status(200);
+            return res.json({success: false});
+        }
+    }
     res.status(200);
     return res.json({success: false});
     
