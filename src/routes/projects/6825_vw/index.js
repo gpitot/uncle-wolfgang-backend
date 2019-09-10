@@ -23,8 +23,9 @@ const codes = [
         date : startTime + (dayMSeconds * 3),
         code : 'CHALLENGE'
     },
+    //code 5 starts sunday 15th
     {
-        date : startTime + (dayMSeconds * 4),
+        date : startTime + (dayMSeconds * 7),
         code : 'TOOLS DOWN'
     }
 ]
@@ -40,7 +41,7 @@ router.post('/', function(req, res, next) {
     const userCode = req.body.code;
 
     const currentDate = new Date().getTime();
-    console.log(currentDate);
+
     for (let i=0; i<codes.length - 1; i+=1) {
         const {date, code} = codes[i];
 
