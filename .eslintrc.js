@@ -4,18 +4,19 @@ module.exports = {
     node: true
   },
   extends: [
-    'eslint:recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings'
+    "eslint:recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings"
   ],
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: "module"
   },
   rules: {
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
-    'import/no-commonjs': 'error'
+    "linebreak-style": ["error", "unix"],
+    quotes: ["error", "single"],
+    semi: ["error", "always"],
+    "import/no-commonjs": "error",
+    "no-console": 0
   }
 };
