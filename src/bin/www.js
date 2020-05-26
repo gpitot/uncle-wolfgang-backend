@@ -12,8 +12,6 @@ const debug = debugLib('express-es6-sample:server');
 /**
  * Get port from environment and store in Express.
  */
-console.log(process.env.PORT);
-console.log(process.env);
 const port = process.env.PORT || 3000;
 app.set('port', port);
 

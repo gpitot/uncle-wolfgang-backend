@@ -8,6 +8,7 @@ import SocketIO from 'socket.io';
 
 import deal from './sockets/deal-player';
 import generateCards from './dealer';
+import { getOddsPostFlop } from './dealer/odds';
 
 const app = express();
 
@@ -46,6 +47,7 @@ io.on('connection', (socket) => {
 
   let cards;
   let cardIndex = 0;
+  let board = [];
 
   players.push({
     id: playerId,
@@ -95,9 +97,20 @@ io.on('connection', (socket) => {
     if (playerId === players[0].id) {
       if (gameConfig.rules[cardIndex] === 'r') {
         io.emit('clearTable');
+        board = [];
         cardIndex = 0;
         return;
       }
+
+      board.push(...cards.slice(0, gameConfig.rules[cardIndex]));
+      console.log(board);
+      const odds = getOddsPostFlop(players, board);
+
+      players.forEach((player, i) => {
+        io.to(player.id).emit('odds', {
+          odds: odds[i],
+        });
+      });
 
       io.emit('center-pile', {
         centerCards: cards.slice(0, gameConfig.rules[cardIndex]),

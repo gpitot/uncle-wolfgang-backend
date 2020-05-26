@@ -1,3 +1,5 @@
+import calculateOdds, { getHandsFromPlayers } from '../../dealer/odds';
+
 const deal = ({ io, players, state, gameConfig, cards }) => {
   state.inGame = true;
 
@@ -14,10 +16,17 @@ const deal = ({ io, players, state, gameConfig, cards }) => {
     });
   }
 
-  players.forEach((player) => {
+  console.log(getHandsFromPlayers(players));
+  const preflop = calculateOdds(getHandsFromPlayers(players), []);
+  console.log(preflop);
+  players.forEach((player, i) => {
     io.to(player.id).emit('deal', {
       cards: player.cards,
       ...state,
+    });
+
+    io.to(player.id).emit('odds', {
+      odds: preflop[i],
     });
   });
 };
