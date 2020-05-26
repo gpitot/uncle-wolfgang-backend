@@ -39,7 +39,7 @@ const gameConfig = {
   cardsPerPlayer: 2,
   deck: 'common',
   numDeck: 1,
-  rules: [3, 1, 1, 'r'],
+  rules: [3, 1, 1, 's', 'r'],
 };
 
 io.on('connection', (socket) => {
@@ -95,8 +95,14 @@ io.on('connection', (socket) => {
 
   socket.on('cardsWanted', () => {
     if (playerId === players[0].id) {
+      if (gameConfig.rules[cardIndex] === 's') {
+        io.emit('showOdds');
+        cardIndex += 1;
+        return;
+      }
+
       if (gameConfig.rules[cardIndex] === 'r') {
-        io.emit('clearTable');
+        io.emit('reset');
         board = [];
         cardIndex = 0;
         return;

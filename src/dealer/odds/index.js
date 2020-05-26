@@ -14,7 +14,6 @@ const getHandsFromPlayers = (players) => {
 
 const getOddsPostFlop = (players, board) => {
   const hands = getHandsFromPlayers(players);
-  console.log(remap('10a'));
   const handStrings = hands.map((hand) => CardGroup.fromString(hand.join()));
   board = board.map((card) => remap(card));
   const boardString = CardGroup.fromString(board.join(''));
@@ -23,7 +22,7 @@ const getOddsPostFlop = (players, board) => {
 };
 
 const calculateOdds = (hands) => {
-  if (hands.length < 2) return null;
+  if (hands.length < 2) return hands.map(() => 100);
   const handStrings = hands.map((hand) => CardGroup.fromString(hand.join()));
 
   const result = OddsCalculator.calculate(handStrings, []);

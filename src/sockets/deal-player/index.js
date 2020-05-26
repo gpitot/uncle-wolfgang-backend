@@ -16,9 +16,7 @@ const deal = ({ io, players, state, gameConfig, cards }) => {
     });
   }
 
-  console.log(getHandsFromPlayers(players));
   const preflop = calculateOdds(getHandsFromPlayers(players), []);
-  console.log(preflop);
   players.forEach((player, i) => {
     io.to(player.id).emit('deal', {
       cards: player.cards,
