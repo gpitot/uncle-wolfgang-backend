@@ -1,6 +1,6 @@
 {
-  "name": "express-es6-sample",
-  "version": "0.0.0",
+  "name": "dealer-backend",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "npm run prod",
@@ -9,7 +9,8 @@
     "build": "npm run clean && babel ./src --out-dir src/src",
     "deploy": "npm run clean && bash deploy",
     "clean": "rimraf src",
-    "watch": "nodemon --config ./nodemon.json --"
+    "watch": "nodemon --config ./nodemon.json --",
+    "heroku-postbuild": "npm run prod"
   },
   "dependencies": {
     "@babel/cli": "^7.4.4",
