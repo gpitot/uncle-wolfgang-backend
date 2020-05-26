@@ -10,8 +10,7 @@
     "deploy": "npm run clean && bash deploy",
     "clean": "rimraf dist",
     "watch": "nodemon --config ./nodemon.json --",
-    "heroku-postbuild": "npm run build",
-    "postinstall" : "npm run prod"
+    "heroku-postbuild": "npm run build && npm run prod"
   },
   "dependencies": {
     "@babel/cli": "^7.4.4",
