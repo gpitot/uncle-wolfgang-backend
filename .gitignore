@@ -1,6 +1,8 @@
 # Created by https://www.gitignore.io/api/node,macos
 # Edit at https://www.gitignore.io/?templates=node,macos
 
+src/queries/database.js
+
 ## build folder
 dist
 build

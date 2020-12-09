@@ -1,12 +1,11 @@
-
 import express from 'express';
-import usersRoute from './api/user';
-import queueRoute from './api/queue';
-
+import ladder from './api/ladder';
+import events from './api/events';
+import query from './api/query';
 const router = express.Router();
 
-
-router.use('/users', usersRoute);
-router.use('/queue', queueRoute);
+router.use('/ladder', ladder);
+router.use('/events', events);
+router.use('/query', query);
 
 export default router;
