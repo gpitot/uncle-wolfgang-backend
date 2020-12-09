@@ -1,9 +1,9 @@
-import express from 'express';
-import { getEvents } from '../../../queries/events';
+import express from "express";
+import { getEvents } from "../../../queries/events";
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   getEvents()
     .then((result) => {
       res.send({
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     .catch((err) => {
       console.log(err);
       res.send({
-        result: 'fail',
+        result: "fail",
       });
     });
 });
