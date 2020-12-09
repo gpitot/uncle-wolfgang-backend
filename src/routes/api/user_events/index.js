@@ -1,5 +1,5 @@
 import express from 'express';
-import { getUsers, insertUserEvent } from '../../../queries/events';
+import { getUsers, addUserEvent } from '../../../queries/user_events';
 import auth from '../../../middleware/auth';
 
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', auth, async (req, res) => {
-  insertUserEvent(req.body)
+  addUserEvent(req.body)
     .then((result) => {
       res.send({
         result,

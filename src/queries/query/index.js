@@ -1,30 +1,20 @@
 import pool from '../index';
 
-const query = (q) => {
+const query = (q, params = []) => {
   return new Promise((resolve, reject) => {
     pool.connect(async (err, client, release) => {
       if (err) {
-        console.log('error occurs here');
-        console.log(err);
+        console.warn(err);
         reject(err);
       }
 
       client
-        .query(q)
+        .query(q, params)
         .then((data) => {
           resolve(data);
         })
         .catch((err) => reject(err))
         .finally(() => release());
-
-      //   try {
-      //     const data = await client.query(q);
-      //     release();
-      //     return resolve(data);
-      //   } catch (err) {
-      //     release();
-      //     return reject("failed");
-      //   }
     });
   });
 };

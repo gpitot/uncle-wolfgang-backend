@@ -1,10 +1,21 @@
 import express from 'express';
-import eventList from './event_list';
-import userEvents from './users';
+import { getEvents } from '../../../queries/events';
 
 const router = express.Router();
 
-router.use('/event_list', eventList);
-router.use('/user_events', userEvents);
+router.get('/', async (req, res) => {
+  getEvents()
+    .then((result) => {
+      res.send({
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        result: 'fail',
+      });
+    });
+});
 
 export default router;

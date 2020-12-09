@@ -22,7 +22,7 @@ const getUsers = ({ event_id, event_date }) => {
   });
 };
 
-const insertUserEvent = ({
+const addUserEvent = ({
   firstname,
   event_id,
   paid = false,
@@ -50,4 +50,4 @@ const insertUserEvent = ({
   });
 };
 
-export { getUsers, insertUserEvent };
+export { getUsers, addUserEvent };
