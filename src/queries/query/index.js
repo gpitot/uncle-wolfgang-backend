@@ -1,4 +1,4 @@
-import pool from '../index';
+import pool from "../index";
 
 const query = (q, params = []) => {
   return new Promise((resolve, reject) => {
@@ -10,10 +10,8 @@ const query = (q, params = []) => {
 
       client
         .query(q, params)
-        .then((data) => {
-          resolve(data);
-        })
-        .catch((err) => reject(err))
+        .then(resolve)
+        .catch(reject)
         .finally(() => release());
     });
   });

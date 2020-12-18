@@ -1,12 +1,11 @@
-import express from 'express';
-import { query } from '../../../queries/query';
+import express from "express";
+import { query } from "../../../queries/query";
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   const q = `
-  INSERT INTO events (event_name, event_description, event_people_limit, event_day)
-   VALUES ('Monday Social Squash Session 2', 'Monday Night Social Squash Session 2', 9, 'monday');
+select * from user_events where event_date > '2020-12-10'::date;
     `;
   query(q)
     .then((result) => {
@@ -17,7 +16,7 @@ router.get('/', async (req, res) => {
     .catch((err) => {
       console.log(err);
       res.send({
-        result: 'fail',
+        result: err,
       });
     });
 });
