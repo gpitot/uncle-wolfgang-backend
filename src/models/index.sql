@@ -1,20 +1,22 @@
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
-    event_name VARCHAR(30) NOT NULL,
-    event_description VARCHAR(400) NOT NULL,
-    event_people_limit integer NOT NULL,
-    event_day VARCHAR(10) NOT NULL,
-    valid BOOLEAN not null DEFAULT FALSE
+    name VARCHAR(30) NOT NULL,
+    description VARCHAR(400) NOT NULL,
+    spots integer NOT NULL,
+    start timestamp NOT NULL,
+    open timestamp NOT NULL,
+    enabled BOOLEAN not null DEFAULT TRUE
 )
 
 CREATE TABLE user_events (
     id SERIAL PRIMARY KEY,
     firstname VARCHAR(30) NOT NULL,
-    event_date DATE NOT NULL,
+    lastname VARCHAR(30) NOT NULL,
+    registered timestamp NOT NULL,
     event_id integer not null references events(id),
     paid BOOLEAN not null default false,
     receipt varchar(100) default null,
-    valid BOOLEAN not null DEFAULT FALSE
+    enabled BOOLEAN not null DEFAULT true
 )
 
 CREATE TABLE ladder_matches (

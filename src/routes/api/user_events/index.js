@@ -1,37 +1,76 @@
 import express from "express";
-import { getUsers, addUserEvent } from "../../../queries/user_events";
+import {
+  getUsers,
+  addUserEvent,
+  updateUserEvent,
+} from "../../../queries/user_events";
 import auth from "../../../middleware/auth";
+import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  getUsers({ event_id: 1, event_date: "2020-12-10" })
-    .then((result) => {
-      res.send({
-        result,
+router.get(
+  "/",
+  (req, res, next) => validateRequest(["event_id"], req.query, res, next),
+  async (req, res) => {
+    getUsers(req.query)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
       });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send({
-        result: "fail",
-      });
-    });
-});
+  }
+);
 
-router.post("/", auth, async (req, res) => {
-  addUserEvent(req.body)
-    .then((result) => {
-      res.send({
-        result,
+router.put(
+  "/",
+  auth,
+  (req, res, next) =>
+    validateRequest(["id", "event_id", "paid", "enabled"], req.body, res, next),
+  async (req, res) => {
+    updateUserEvent(req.body)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
       });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send({
-        result: "fail",
+  }
+);
+
+router.post(
+  "/",
+  auth,
+  (req, res, next) =>
+    validateRequest(["firstname", "event_id"], req.body, res, next),
+  async (req, res) => {
+    addUserEvent(req.body)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        res.send({
+          success: false,
+          err
+        });
       });
-    });
-});
+  }
+);
 
 export default router;

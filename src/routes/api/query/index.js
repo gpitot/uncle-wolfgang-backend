@@ -5,8 +5,14 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const q = `
-select * from user_events where event_date > '2020-12-10'::date;
+  SELECT 
+  events.spots, events.start, events.open, events.enabled, user_events.firstname
+   from events left join user_events on events.id = user_events.event_id
+   where events.id = 1 and events.start > now() and events.open < now() and user_events.enabled = true;
+  ;
     `;
+
+  //2020-12-19T08:16:04.714Z"
   query(q)
     .then((result) => {
       res.send({
