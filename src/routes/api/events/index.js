@@ -1,5 +1,5 @@
 import express from "express";
-import { addEvent, getEvents, editEvent } from "../../../queries/events";
+import { addEvent, getEvent, getEvents, editEvent } from "../../../queries/events";
 import auth from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
@@ -20,6 +20,26 @@ router.get("/", async (req, res) => {
       });
     });
 });
+
+router.get(
+  "/:id",
+  (req, res, next) => validateRequest(["id"], req.params, res, next),
+  async (req, res) => {
+    getEvent(req.params)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
 
 router.put(
   "/",

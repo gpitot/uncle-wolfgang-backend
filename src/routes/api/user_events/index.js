@@ -10,10 +10,10 @@ import { validateRequest } from "../../../middleware/validation";
 const router = express.Router();
 
 router.get(
-  "/",
-  (req, res, next) => validateRequest(["event_id"], req.query, res, next),
+  "/:event_id",
+  (req, res, next) => validateRequest(["event_id"], req.params, res, next),
   async (req, res) => {
-    getUsers(req.query)
+    getUsers(req.params)
       .then((result) => {
         res.send({
           success: true,
