@@ -4,26 +4,23 @@ const getEvent = ({ id }) => {
   const sql = `
   SELECT 
   *
-   from events left join user_events on events.id = user_events.event_id
+   from events 
    where events.id = $1
   `;
   //const sql = `SELECT *, now() FROM events;`;
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
-        resolve(data.rows);
+        resolve(data.rows[0]);
       })
       .catch((err) => reject(err));
   });
 };
 
 const getEvents = () => {
-  const sql = `
-  SELECT * FROM events
-  WHERE
-  open < now() and start > now();
-  `;
-  //const sql = `SELECT *, now() FROM events;`;
+  //for some reason needs to add 11 hours because it takes 11 off the now ?
+  const sql = `SELECT *, current_timestamp FROM events
+  where start >= now() + '11 hour'::interval and open <= now() + '11 hour'::interval`;
   return new Promise((resolve, reject) => {
     query(sql)
       .then((data) => {
