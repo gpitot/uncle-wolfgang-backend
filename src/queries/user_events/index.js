@@ -42,11 +42,10 @@ const addUserEvent = ({
 }) => {
   const checkEventStartStopSql = `
   SELECT 
-  events.spots, events.start, events.open, events.enabled, user_events.firstname
+  events.spots, events.start, events.open, events.enabled as event_enabled, user_events.firstname, user_events.enabled as user_event_enabled
    from events left join user_events on events.id = user_events.event_id
-   where events.id = $1 and events.start > now() and events.open < now()
-   and events.enabled = true
-   and user_events.enabled = true;
+   where events.id = $1 and events.start >= now() + '11 hour'::interval and events.open <= now() + '11 hour'::interval
+   and events.enabled = true;
   `;
 
   const addUserEventSql = `
@@ -67,7 +66,14 @@ const addUserEvent = ({
           return reject(`Event ${event_id} is not enabled`);
         }
 
-        if (data.rows.length >= spots) {
+        //count all entries that are enabled
+        let enabledEntries = 0;
+        for (let i = 0; i < data.rows.length; i += 1) {
+          if (data.rows[i].user_event_enabled === true) {
+            enabledEntries += 1;
+          }
+        }
+        if (enabledEntries >= spots) {
           return reject(
             `Event ${event_id} is full at max capacity at ${spots} spots`
           );

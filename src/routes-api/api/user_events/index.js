@@ -1,31 +1,19 @@
 import express from "express";
-import { addEvent, getEvent, getEvents, editEvent } from "../../../queries/events";
-import auth from "../../../middleware/auth";
+import {
+  getUsers,
+  addUserEvent,
+  updateUserEvent,
+} from "../../../queries/user_events";
+import {authenticateAdmin} from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  getEvents()
-    .then((result) => {
-      res.send({
-        success: true,
-        result,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send({
-        success: false,
-      });
-    });
-});
-
 router.get(
-  "/:id",
-  (req, res, next) => validateRequest(["id"], req.params, res, next),
+  "/:event_id",
+  (req, res, next) => validateRequest(["event_id"], req.params, res, next),
   async (req, res) => {
-    getEvent(req.params)
+    getUsers(req.params)
       .then((result) => {
         res.send({
           success: true,
@@ -43,16 +31,11 @@ router.get(
 
 router.put(
   "/",
-  auth,
+  authenticateAdmin,
   (req, res, next) =>
-    validateRequest(
-      ["id", "name", "description", "spots", "start", "open", "enabled"],
-      req.body,
-      res,
-      next
-    ),
+    validateRequest(["id", "event_id", "paid", "enabled"], req.body, res, next),
   async (req, res) => {
-    editEvent(req.body)
+    updateUserEvent(req.body)
       .then((result) => {
         res.send({
           success: true,
@@ -70,25 +53,22 @@ router.put(
 
 router.post(
   "/",
-  auth,
   (req, res, next) =>
-    validateRequest(
-      ["name", "description", "spots", "start", "open"],
-      req.body,
-      res,
-      next
-    ),
+    validateRequest(["firstname", "lastname", "event_id"], req.body, res, next),
   async (req, res) => {
-    addEvent(req.body)
+    console.log(req.body);
+    addUserEvent(req.body)
       .then((result) => {
         res.send({
           success: true,
           result,
         });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         res.send({
           success: false,
+          err,
         });
       });
   }

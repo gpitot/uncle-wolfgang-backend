@@ -1,19 +1,38 @@
 import express from "express";
 import {
-  getUsers,
-  addUserEvent,
-  updateUserEvent,
-} from "../../../queries/user_events";
-import auth from "../../../middleware/auth";
+  addEvent,
+  getEvent,
+  getEvents,
+  editEvent,
+} from "../../../queries/events";
+import { authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
 
+router.get("/", async (req, res) => {
+  const { user } = req;
+  console.log("GUILLAUME USER ", user);
+  getEvents()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        success: false,
+      });
+    });
+});
+
 router.get(
-  "/:event_id",
-  (req, res, next) => validateRequest(["event_id"], req.params, res, next),
+  "/:id",
+  (req, res, next) => validateRequest(["id"], req.params, res, next),
   async (req, res) => {
-    getUsers(req.params)
+    getEvent(req.params)
       .then((result) => {
         res.send({
           success: true,
@@ -31,11 +50,16 @@ router.get(
 
 router.put(
   "/",
-  auth,
+  authenticateAdmin,
   (req, res, next) =>
-    validateRequest(["id", "event_id", "paid", "enabled"], req.body, res, next),
+    validateRequest(
+      ["id", "name", "description", "spots", "start", "open", "enabled"],
+      req.body,
+      res,
+      next
+    ),
   async (req, res) => {
-    updateUserEvent(req.body)
+    editEvent(req.body)
       .then((result) => {
         res.send({
           success: true,
@@ -53,21 +77,25 @@ router.put(
 
 router.post(
   "/",
-  auth,
+  authenticateAdmin,
   (req, res, next) =>
-    validateRequest(["firstname", "event_id"], req.body, res, next),
+    validateRequest(
+      ["name", "description", "spots", "start", "open"],
+      req.body,
+      res,
+      next
+    ),
   async (req, res) => {
-    addUserEvent(req.body)
+    addEvent(req.body)
       .then((result) => {
         res.send({
           success: true,
           result,
         });
       })
-      .catch((err) => {
+      .catch(() => {
         res.send({
           success: false,
-          err
         });
       });
   }
