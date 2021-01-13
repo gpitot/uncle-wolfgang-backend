@@ -5,14 +5,12 @@ import {
   getEvents,
   editEvent,
 } from "../../../queries/events";
-import { authenticateAdmin } from "../../../middleware/auth";
+import {  authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const { user } = req;
-  console.log("GUILLAUME USER ", user);
   getEvents()
     .then((result) => {
       res.send({
@@ -50,7 +48,7 @@ router.get(
 
 router.put(
   "/",
-  authenticateAdmin,
+
   (req, res, next) =>
     validateRequest(
       ["id", "name", "description", "spots", "start", "open", "enabled"],
@@ -58,6 +56,7 @@ router.put(
       res,
       next
     ),
+  authenticateAdmin,
   async (req, res) => {
     editEvent(req.body)
       .then((result) => {
@@ -77,7 +76,7 @@ router.put(
 
 router.post(
   "/",
-  authenticateAdmin,
+
   (req, res, next) =>
     validateRequest(
       ["name", "description", "spots", "start", "open"],
@@ -85,6 +84,7 @@ router.post(
       res,
       next
     ),
+  authenticateAdmin,
   async (req, res) => {
     addEvent(req.body)
       .then((result) => {

@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -21,9 +22,7 @@ router.get(
   "/callback/google",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    //check if user is in users table and create user if not
-
-    res.redirect("http://localhost:3001");
+    res.redirect("http://localhost:3001/?updatelogin=true");
   }
 );
 

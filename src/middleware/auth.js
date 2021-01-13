@@ -2,8 +2,8 @@ import { getUser } from "../queries/users/index";
 
 const authenticateUser = (req, res, next) => {
   const { user } = req;
-  if (!user) {
-    res.redirect("/auth/login/google");
+  if (user === undefined) {
+    return res.status(405).send("/auth/login/google");
   }
   const { id } = user;
   getUser({ id })
@@ -11,14 +11,14 @@ const authenticateUser = (req, res, next) => {
       next();
     })
     .catch(() => {
-      res.redirect("/auth/login/google");
+      return res.status(405).send("/auth/login/google");
     });
 };
 
 const authenticateAdmin = (req, res, next) => {
   const { user } = req;
   if (!user) {
-    res.redirect("/auth/login/google");
+    return res.status(405).send("/auth/login/google");
   }
   const { id } = user;
   getUser({ id })
@@ -30,7 +30,7 @@ const authenticateAdmin = (req, res, next) => {
       }
     })
     .catch(() => {
-      res.redirect("/auth/login/google");
+      return res.status(405).send("/auth/login/google");
     });
 };
 

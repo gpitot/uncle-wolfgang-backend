@@ -4,7 +4,7 @@ import {
   addUserEvent,
   updateUserEvent,
 } from "../../../queries/user_events";
-import {authenticateAdmin} from "../../../middleware/auth";
+import { authenticateAdmin, authenticateUser } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
@@ -31,9 +31,10 @@ router.get(
 
 router.put(
   "/",
-  authenticateAdmin,
+
   (req, res, next) =>
     validateRequest(["id", "event_id", "paid", "enabled"], req.body, res, next),
+  authenticateAdmin,
   async (req, res) => {
     updateUserEvent(req.body)
       .then((result) => {
@@ -53,11 +54,13 @@ router.put(
 
 router.post(
   "/",
-  (req, res, next) =>
-    validateRequest(["firstname", "lastname", "event_id"], req.body, res, next),
+  (req, res, next) => validateRequest(["event_id"], req.body, res, next),
+  authenticateUser,
   async (req, res) => {
-    console.log(req.body);
-    addUserEvent(req.body)
+    addUserEvent({
+      user_id: req.user.id,
+      event_id: req.body.event_id,
+    })
       .then((result) => {
         res.send({
           success: true,
