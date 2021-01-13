@@ -66,7 +66,7 @@ router.post(
   "/:ladder_id/challenge",
   (req, res, next) =>
     validateRequest(
-      ["ladder_id", "player_2", "challenge_date"],
+      ["ladder_id", "player_2"],
       {
         ...req.body,
         ...req.params,
@@ -108,8 +108,7 @@ router.put(
     })
       .then((result) => {
         res.send({
-          success: true,
-          result,
+          success: result,
         });
       })
       .catch(() => {
@@ -160,7 +159,8 @@ router.put(
           result,
         });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         res.send({
           success: false,
         });
@@ -173,13 +173,7 @@ match_id, ladder_id, winner, loser
 */
 router.put(
   "/challenge/approve",
-  (req, res, next) =>
-    validateRequest(
-      ["match_id", "ladder_id", "winner", "loser"],
-      req.body,
-      res,
-      next
-    ),
+  (req, res, next) => validateRequest(["match_id"], req.body, res, next),
   authenticateAdmin,
   async (req, res) => {
     approveResult(req.body)
@@ -189,7 +183,8 @@ router.put(
           result,
         });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         res.send({
           success: false,
         });

@@ -23,7 +23,7 @@ const authenticateAdmin = (req, res, next) => {
   const { id } = user;
   getUser({ id })
     .then((res) => {
-      if (res.role === "admin") {
+      if (res.role === "admin" || res.role === "superman") {
         next();
       } else {
         res.status(400).send("Auth error");
