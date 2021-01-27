@@ -40,7 +40,8 @@ router.get("/:ladder_id/matches", async (req, res) => {
         result,
       });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res.send({
         success: false,
       });

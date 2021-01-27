@@ -1,11 +1,11 @@
 import express from "express";
 import { addUser, updateUser, getUser } from "../../../queries/users";
-import { authenticateUser } from "../../../middleware/auth";
 
 const router = express.Router();
 
-router.get("/me", authenticateUser, async (req, res) => {
+router.get("/me", async (req, res) => {
   const { user } = req;
+  if (user === undefined) return res.send({ success: false });
   getUser(user)
     .then(({ photo, firstname, lastname, id, role }) => {
       res.send({

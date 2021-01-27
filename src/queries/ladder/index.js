@@ -11,46 +11,65 @@ const getLadders = () => {
   });
 };
 
-const getMatches = ({ ladder_id, player_id = null, challenges = false }) => {
+const getMatches = ({
+  ladder_id,
+  player_id = undefined,
+  challenges = false,
+}) => {
   //with playerid gets challenges for that player
-  const onlyChallenges = challenges
-    ? "(MATCH_DATE is null or MATCH_DATE > now())"
-    : "MATCH_DATE < now()";
+  const args = [ladder_id];
+
+  let sql = `
+  SELECT LADDER_MATCHES.id,
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
+  LADDER_MATCHES.match_date,
+  LADDER_MATCHES.player_2_games,
+  LADDER_MATCHES.player_1_games,
+  LADDER_MATCHES.player_1_paid,
+  LADDER_MATCHES.player_2_paid,
+  LADDER_MATCHES.approved,
+  LADDER_MATCHES.accepted,
+
+  player_1_users.firstname as player_1_firstname,
+  player_1_users.lastname as player_1_lastname, 
+  player_1_users.photo as player_1_photo,
+
+  player_2_users.firstname as player_2_firstname,
+  player_2_users.lastname as player_2_lastname, 
+  player_2_users.photo as player_2_photo
+   FROM LADDER_MATCHES 
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+   WHERE
+
+   `;
+
+  const onlyChallenges =
+    challenges === "true"
+      ? "(MATCH_DATE is null or MATCH_DATE > now())"
+      : "MATCH_DATE < now() and approved = true";
+
+  sql += onlyChallenges;
+
   if (player_id) {
-    const sql = `
-    SELECT * FROM LADDER_MATCHES 
-    WHERE ${onlyChallenges}
+    sql += `
     and (
-        player_1 = $2
-        or
-        player_2 = $2
-    )
-    and ladder_id = $1
-    order by match_date DESC, challenge_date DESC
-    ;
+      player_1 = $2
+      or
+      player_2 = $2
+  )
     `;
-
-    //console.log(sql);
-
-    return new Promise((resolve, reject) => {
-      query(sql, [ladder_id, player_id])
-        .then((data) => {
-          resolve(data.rows);
-        })
-        .catch((err) => reject(err));
-    });
+    args.push(player_id);
   }
 
-  const sql = `
-    SELECT * FROM LADDER_MATCHES 
-    WHERE ${onlyChallenges}
-    and ladder_id = $1
-    order by match_date DESC, challenge_date DESC
-    ;
+  sql += `
+  and ladder_id = $1
+    order by match_date DESC, challenge_date DESC;
     `;
 
   return new Promise((resolve, reject) => {
-    query(sql, [ladder_id])
+    query(sql, args)
       .then((data) => {
         resolve(data.rows);
       })
@@ -97,10 +116,32 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
     )
     `;
 
+  //first check that this challenge has not already been made (and pending)
+  const noChallengeYet = `
+      select * from ladder_matches
+      where 
+      ladder_id = $1
+      and
+      player_1 = $2
+      and
+      player_2 = $3
+      and
+      accepted = false
+  `;
+
   return new Promise((resolve, reject) => {
-    query(sql, [ladder_id, player_1, player_2])
+    if (player_1 === player_2) return reject("Cannot challenge yourself");
+    query(noChallengeYet, [ladder_id, player_1, player_2])
       .then((data) => {
-        resolve(data.rows);
+        if (data.rows.length > 0) {
+          reject("Challenge already exists");
+        } else {
+          query(sql, [ladder_id, player_1, player_2])
+            .then((data) => {
+              resolve(data.rows);
+            })
+            .catch((err) => reject(err));
+        }
       })
       .catch((err) => reject(err));
   });
