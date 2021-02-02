@@ -22,7 +22,7 @@ router.get(
   "/callback/google",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    res.redirect("http://localhost:3001/?updatelogin=true");
+    res.redirect(`${process.env.SITE_URL}/?updatelogin=true`);
   }
 );
 
