@@ -1,0 +1,47 @@
+@import "styles/colors";
+@import "styles/sizes";
+@import "styles/breakpoints";
+
+.bg {
+  width: 100px;
+  height: 100px;
+}
+
+.base {
+  background: $base-blue;
+  min-height: 520px;
+  padding-bottom: 60px;
+
+  @media (min-width: $device-medium) {
+    padding-bottom: 100px;
+  }
+}
+
+.book {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  z-index: 2;
+  display: block;
+  background: $base-dark;
+  color: $base-light;
+  text-align: center;
+  font-size: 1.5rem;
+  padding: $unit * 2;
+  text-decoration: none;
+  transition: all 600ms ease;
+  &:hover {
+    background: $base-light;
+    color: $base-blue;
+  }
+
+  @media (min-width: $device-medium) {
+    font-size: 3rem;
+  }
+}
+
+.background {
+  background: $base-blue;
+}

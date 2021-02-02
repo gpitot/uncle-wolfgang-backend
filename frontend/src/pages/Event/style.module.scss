@@ -1,0 +1,38 @@
+@import "styles/colors";
+@import "styles/sizes";
+@import "styles/breakpoints";
+
+.eventArea {
+  color: $base-light;
+  padding: $unit * 4;
+  h5 {
+    margin: 0;
+    margin-bottom: $unit * 2;
+  }
+}
+.cancelled {
+  padding: $unit * 2;
+}
+
+.cancelled {
+  background: $base-dark;
+}
+
+.signup {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  display: inline-block;
+}
+
+.row {
+  display: flex;
+}

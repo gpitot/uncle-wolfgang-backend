@@ -1,0 +1,12 @@
+@import "styles/colors";
+@import "styles/sizes";
+.user {
+  display: flex;
+  align-items: center;
+  img {
+    max-width:48px;
+    max-height:48px;
+    border-radius: 50%;
+    margin-right:$unit * 2;
+  }
+}

@@ -1,0 +1,36 @@
+@import "styles/colors";
+@import "styles/sizes";
+@import "styles/breakpoints";
+.table-outer {
+  margin-top: $unit * 2;
+
+  table {
+    width: 100%;
+    display: block;
+    overflow: auto;
+
+    @media (min-width: $device-medium) {
+      display: table;
+    }
+  }
+  th {
+    background: $base-dark;
+    color: $base-light;
+  }
+
+  td,
+  th {
+    padding: $unit * 1 $unit * 1;
+    font-size: 14px;
+    margin: 0;
+    border: solid 2px $base-blue;
+
+    @media (min-width: $device-medium) {
+      padding: $unit * 1 $unit * 2;
+    }
+  }
+  td {
+    text-align: center;
+    position: relative;
+  }
+}

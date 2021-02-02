@@ -1,0 +1,17 @@
+@import "styles/colors";
+@import "styles/sizes";
+@import "styles/breakpoints";
+
+.event {
+  width: 300px;
+  margin: 0 $unit;
+  padding: $unit * 2;
+  color: $base-dark;
+  background: $base-light;
+  box-shadow: 0 0 8px 4px #ffffff94;
+  text-decoration: none;
+
+  h2 {
+    text-decoration: underline;
+  }
+}

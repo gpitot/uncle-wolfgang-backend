@@ -1,0 +1,10 @@
+@import "styles/colors";
+@import "styles/sizes";
+
+.block {
+  padding: $unit * 2 $unit * 3;
+  background: $base-light;
+  border-radius: $unit / 2;
+  color: $base-blue;
+  margin: 0 $unit * 2 ;
+}
