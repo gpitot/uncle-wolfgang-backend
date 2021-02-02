@@ -7,8 +7,8 @@
     "dev": "npm run watch ./src/bin/www",
     "prod": "NODE_ENV=production node ./dist/bin/www",
     "build-old": "npm run clean && babel ./src --out-dir dist",
-    "build" : "npm run clean && babel ./src --out-dir dist && cd frontend && npm install --development && npm run build && mv build ../dist/frontend",
-    "deploy": "npm run clean && bash deploy",
+    "build": "npm run clean && babel ./src --out-dir dist && mv frontend_build dist/frontend",
+    "deploy": "cd frontend && npm run build && mv build ../frontend_build && cd .. && git add frontend_build && git commit -m 'frontend build' && git push origin master",
     "clean": "rimraf dist",
     "watch": "nodemon --config ./nodemon.json --",
     "heroku-postbuild": "npm run build"
