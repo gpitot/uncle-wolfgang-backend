@@ -9,6 +9,7 @@ import http from "http";
 import expressSession from "express-session";
 import apiRouter from "./routes-api";
 import authRouter from "./routes-auth";
+import path from "path";
 
 require("dotenv").config();
 
@@ -50,10 +51,6 @@ app.use(
     secret: SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
-    cookie: {
-      sameSite: "none",
-      secure: true,
-    },
   })
 );
 app.use(passport.initialize());
@@ -73,8 +70,10 @@ app.use(
   })
 );
 
+app.use(express.static(path.join(__dirname, "/frontend")));
+
 app.get("/", (req, res) => {
-  res.send("hello world");
+  res.sendFile(path.join(__dirname, "/frontend/index.html"));
 });
 
 app.use("/api", apiRouter);
