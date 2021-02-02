@@ -6,3 +6,5 @@ dist
 
 # exclude src
 !src/**
+
+frontend
