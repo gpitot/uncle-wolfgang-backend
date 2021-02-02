@@ -3,6 +3,7 @@ import {
   getUsers,
   addUserEvent,
   updateUserEvent,
+  removeSelfUserEvent,
 } from "../../../queries/user_events";
 import { authenticateAdmin, authenticateUser } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -31,12 +32,32 @@ router.get(
 
 router.put(
   "/",
-
   (req, res, next) =>
     validateRequest(["id", "event_id", "paid", "enabled"], req.body, res, next),
   authenticateAdmin,
   async (req, res) => {
     updateUserEvent(req.body)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.put(
+  "/remove",
+  (req, res, next) => validateRequest(["id"], req.body, res, next),
+  authenticateUser,
+  async (req, res) => {
+    removeSelfUserEvent({ ...req.body, user: req.user })
       .then((result) => {
         res.send({
           success: true,

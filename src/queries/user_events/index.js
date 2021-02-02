@@ -3,17 +3,20 @@ import { query } from "../query";
 const getUsers = ({ event_id }) => {
   const sql = `
     SELECT 
+    user_events.id as id,
     user_events.event_id,
     user_events.enabled,
     user_events.paid,
-    users.id,
+    users.id as user_id,
     users.firstname,
     users.lastname,
     users.photo
     
     FROM user_events left join users
     on user_events.user_id = users.id
-    WHERE event_id = $1;
+    WHERE event_id = $1
+    and enabled = true
+    order by user_events.registered;
     `;
   return new Promise((resolve, reject) => {
     query(sql, [event_id])
@@ -40,6 +43,37 @@ const updateUserEvent = ({ id, event_id, paid, enabled }) => {
         resolve(data.rows);
       })
       .catch((err) => reject(err));
+  });
+};
+
+const removeSelfUserEvent = ({ id, user }) => {
+  console.log(id, user.id);
+  const getValidUser = `
+    select * from user_events where id = $1 and user_id = $2;
+  `;
+  const sql = `
+  update user_events
+  set 
+  enabled = false
+  where id = $1;
+   `;
+
+  return new Promise((resolve, reject) => {
+    query(getValidUser, [id, user.id])
+      .then((data) => {
+        if (data.rows.length === 0) {
+          return reject("Invalid user tried to delete user_event");
+        }
+        query(sql, [id])
+          .then((data) => {
+            resolve(data.rows);
+          })
+          .catch((err) => reject(err));
+      })
+      .catch((err) => {
+        console.log(err);
+        return reject("Invalid user tried to delete user_event");
+      });
   });
 };
 
@@ -91,4 +125,4 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
   });
 };
 
-export { getUsers, addUserEvent, updateUserEvent };
+export { getUsers, addUserEvent, updateUserEvent, removeSelfUserEvent };
