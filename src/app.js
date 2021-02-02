@@ -59,7 +59,15 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "http://localhost:3001" }));
+app.use(
+  cors({
+    credentials: true,
+    origin: [
+      "http://localhost:3001",
+      "https://laughing-williams-8517be.netlify.app",
+    ],
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("hello world");
