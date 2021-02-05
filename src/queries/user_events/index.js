@@ -88,7 +88,8 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
 
   const addUserEventSql = `
   INSERT INTO user_events (user_id, registered, event_id, paid, receipt)
-   VALUES ($1, now(), $2, $3, $4);
+   VALUES ($1, now(), $2, $3, $4)
+   returning *;
   `;
 
   return new Promise((resolve, reject) => {
@@ -118,7 +119,7 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
         }
 
         query(addUserEventSql, [user_id, event_id, paid, receipt])
-          .then(() => resolve())
+          .then((data) => resolve(data.rows[0]))
           .catch((err) => reject(err));
       })
       .catch((err) => reject(err));

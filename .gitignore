@@ -2,7 +2,7 @@
 # Edit at https://www.gitignore.io/?templates=node,macos
 
 src/queries/database.js
-
+ui
 ## build folder
 dist
 build

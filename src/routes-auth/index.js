@@ -10,7 +10,9 @@ router.get("/", (req, res) => {
 
 router.get(
   "/login/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
 );
 
 router.get("/logout", (req, res) => {
@@ -20,7 +22,9 @@ router.get("/logout", (req, res) => {
 
 router.get(
   "/callback/google",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  passport.authenticate("google", {
+    failureRedirect: "/",
+  }),
   (req, res) => {
     res.redirect(`${process.env.SITE_URL}/?updatelogin=true`);
   }

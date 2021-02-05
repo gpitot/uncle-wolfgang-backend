@@ -172,6 +172,10 @@ router.put(
 /*
 match_id, ladder_id, winner, loser 
 */
+
+/*
+later on let the 2nd player approve the 1st player result
+*/
 router.put(
   "/challenge/approve",
   (req, res, next) => validateRequest(["match_id"], req.body, res, next),

@@ -1,25 +1,14 @@
 import { getUser } from "../queries/users/index";
+import passport from "passport";
 
 const authenticateUser = (req, res, next) => {
-  const { user } = req;
-  if (user === undefined) {
-    return res.status(405).send("/auth/login/google");
-  }
-  const { id } = user;
-  getUser({ id })
-    .then(() => {
-      next();
-    })
-    .catch(() => {
-      return res.status(405).send("/auth/login/google");
-    });
+  passport.authenticate("google", { scope: ["profile", "email"] });
+  next();
 };
 
 const authenticateAdmin = (req, res, next) => {
+  passport.authenticate("google", { scope: ["profile", "email"] });
   const { user } = req;
-  if (!user) {
-    return res.status(405).send("/auth/login/google");
-  }
   const { id } = user;
   getUser({ id })
     .then((res) => {
