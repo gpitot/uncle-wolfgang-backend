@@ -8,7 +8,7 @@
     "prod": "NODE_ENV=production node ./dist/bin/www",
     "build-old": "npm run clean && babel ./src --out-dir dist",
     "build": "npm run clean && babel ./src --out-dir dist && mv frontend_build dist/frontend",
-    "deploy": "npm run clean && cd ui && REACT_APP_API_URL=https://north-manly-squash.herokuapp.com npm run build && mv build ../frontend_build && cd .. && git add frontend_build && git commit -m 'frontend build' && git push origin master",
+    "deploy": "npm run clean && cd ui && source $HOME/.nvm/nvm.sh; nvm use && REACT_APP_API_URL=https://north-manly-squash.herokuapp.com npm run build && mv build ../frontend_build && cd .. && source $HOME/.nvm/nvm.sh; nvm use && git add frontend_build && git commit -m 'frontend build' && git push origin master",
     "clean": "rimraf dist && rimraf frontend_build",
     "watch": "nodemon --config ./nodemon.json --",
     "heroku-postbuild": "npm run build"
