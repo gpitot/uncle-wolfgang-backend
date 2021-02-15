@@ -61,5 +61,6 @@ CREATE TABLE LADDER_RANKS (
     ladder_id integer references ladders(id),
     player_id VARCHAR(100) references users(id),
     rank decimal not null,
-    recent_change integer default 0
+    recent_change integer default 0,
+    UNIQUE (ladder_id, player_id)
 )

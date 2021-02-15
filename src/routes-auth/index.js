@@ -26,7 +26,8 @@ router.get(
     failureRedirect: "/",
   }),
   (req, res) => {
-    res.redirect(`${process.env.SITE_URL}/?updatelogin=true`);
+    const redirectTo = req.session.redirectTo ? req.session.redirectTo : "/";
+    res.redirect(`${process.env.SITE_URL}${redirectTo}?updatelogin=true`);
   }
 );
 

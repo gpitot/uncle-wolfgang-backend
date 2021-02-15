@@ -8,6 +8,7 @@ import {
   setMatchTime,
   submitResult,
   approveResult,
+  signUp,
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -186,6 +187,27 @@ router.put(
         res.send({
           success: true,
           result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.post(
+  "/signup",
+  (req, res, next) => validateRequest(["ladder_id"], req.body, res, next),
+  authenticateUser,
+  async (req, res) => {
+    const player_id = req.user.id;
+    signUp({ ...req.body, player_id })
+      .then(() => {
+        res.send({
+          success: true,
         });
       })
       .catch((err) => {

@@ -376,6 +376,49 @@ const changeRank = ({ ladder_id, winner, loser }) => {
   });
 };
 
+const getBottomRank = (ladder_id) => {
+  const sql = `
+    select rank from ladder_ranks 
+    where ladder_id = $1
+    order by rank ASC
+    limit 1
+  `;
+
+  return new Promise((resolve, reject) => {
+    query(sql, [ladder_id])
+      .then((data) => {
+        if (data.rows.length === 0) {
+          return resolve(5000);
+        }
+        resolve(data.rows[0].rank);
+      })
+      .catch((err) => reject(err));
+  });
+};
+
+const signUp = ({ ladder_id, player_id }) => {
+  const sql = `
+    INSERT INTO LADDER_RANKS (ladder_id, player_id, rank) VALUES (
+      $1, $2, $3
+    );
+  `;
+  console.log("signUp ", ladder_id, player_id);
+  return new Promise((resolve, reject) => {
+    getBottomRank(ladder_id)
+      .then((bottomRank) => {
+        console.log(bottomRank);
+        const newBottomRank = bottomRank / 2;
+
+        query(sql, [ladder_id, player_id, newBottomRank])
+          .then(() => {
+            resolve();
+          })
+          .catch((err) => reject(err));
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 export {
   getLadders,
   getMatches,
@@ -385,4 +428,5 @@ export {
   setMatchTime,
   submitResult,
   approveResult,
+  signUp,
 };

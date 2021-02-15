@@ -2,7 +2,11 @@ import { getUser } from "../queries/users/index";
 import passport from "passport";
 
 const authenticateUser = (req, res, next) => {
-  passport.authenticate("google", { scope: ["profile", "email"] });
+  const { user } = req;
+  if (user === undefined) {
+    req.session.redirectTo = req.headers.preauthurl;
+    return res.status(405).send("/auth/login/google");
+  }
   next();
 };
 
