@@ -72,9 +72,12 @@ app.use(
 
 app.use(express.static(path.join(__dirname, "/frontend")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/frontend/index.html"));
-});
+app.get(
+  ["/", "/social", "/competition", "/competition/*", "/coaching", "/shop"],
+  (req, res) => {
+    res.sendFile(path.join(__dirname, "/frontend/index.html"));
+  }
+);
 
 app.use("/api", apiRouter);
 app.use("/auth", authRouter);
