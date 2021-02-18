@@ -1,6 +1,8 @@
 import express from "express";
 import passport from "passport";
 
+import { addUser, updateUser, getUser } from "../queries/users";
+
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -26,8 +28,29 @@ router.get(
     failureRedirect: "/",
   }),
   (req, res) => {
-    const redirectTo = req.session.redirectTo ? req.session.redirectTo : "/";
-    res.redirect(`${process.env.SITE_URL}${redirectTo}?updatelogin=true`);
+    //update or add user
+    const { user } = req;
+    const redirectTo = req.session.redirect ? req.session.redirect : "/";
+
+    getUser(user)
+      .then(() => {
+        //update user
+        console.log("updating a user");
+        updateUser({ user })
+          .then(() => {
+            res.redirect(`${process.env.SITE_URL}${redirectTo}`);
+          })
+          .catch(() => {
+            res.redirect(`${process.env.SITE_URL}${redirectTo}`);
+          });
+      })
+      .catch(() => {
+        //create user
+        console.log("adding a user");
+        addUser({ user })
+          .then(() => res.redirect(`${process.env.SITE_URL}${redirectTo}`))
+          .catch(() => res.redirect(`${process.env.SITE_URL}${redirectTo}`));
+      });
   }
 );
 

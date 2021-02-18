@@ -1,5 +1,5 @@
 import express from "express";
-import { addUser, updateUser, getUser } from "../../../queries/users";
+import { getUser } from "../../../queries/users";
 
 const router = express.Router();
 
@@ -21,28 +21,6 @@ router.get("/me", async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-    });
-});
-
-router.get("/refresh", async (req, res) => {
-  const { user } = req;
-  if (!user) return res.send({ success: false });
-  getUser(user)
-    .then(() => {
-      //update user
-      console.log("updating a user");
-      updateUser({ user })
-        .then(() => res.send({ success: true }))
-        .catch(() => {
-          res.send({ success: false });
-        });
-    })
-    .catch(() => {
-      //create user
-      console.log("adding a user");
-      addUser({ user })
-        .then(() => res.send({ success: true }))
-        .catch(() => res.send({ success: false }));
     });
 });
 
