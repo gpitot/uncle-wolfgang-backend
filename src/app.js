@@ -70,7 +70,15 @@ app.use(
 app.use(express.static(path.join(__dirname, "/frontend")));
 
 app.get(
-  ["/", "/social", "/competition", "/competition/*", "/coaching", "/shop"],
+  [
+    "/",
+    "/social",
+    "/event/*",
+    "/competition",
+    "/competition/*",
+    "/coaching",
+    "/shop",
+  ],
   (req, res) => {
     res.sendFile(path.join(__dirname, "/frontend/index.html"));
   }
