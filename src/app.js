@@ -63,10 +63,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: [
-      "http://localhost:3001",
-      "https://laughing-williams-8517be.netlify.app",
-    ],
+    origin: ["http://localhost:3001"],
   })
 );
 
