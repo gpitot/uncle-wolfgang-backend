@@ -46,6 +46,19 @@ passport.deserializeUser((obj, cb) => {
   cb(null, obj);
 });
 
+app.use(cookieParser());
+
+const setCookiePassport = (req, res, next) => {
+  if (req.headers.authcookie) {
+    req.cookies["connect.sid"] = req.headers.authcookie;
+    //req.headers.cookie = req.headers.authcookie.replace(":", "%3A");
+  }
+
+  next();
+};
+
+app.use(setCookiePassport);
+
 app.use(
   expressSession({
     secret: SESSION_SECRET,
@@ -59,7 +72,7 @@ app.use(passport.session());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+
 app.use(
   cors({
     credentials: true,

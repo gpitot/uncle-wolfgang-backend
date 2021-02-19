@@ -29,27 +29,38 @@ router.get(
   }),
   (req, res) => {
     //update or add user
-    const { user } = req;
+    const { user, cookies } = req;
     const redirectTo = req.session.redirect ? req.session.redirect : "/";
 
     getUser(user)
       .then(() => {
         //update user
-        console.log("updating a user");
         updateUser({ user })
           .then(() => {
-            res.redirect(`${process.env.SITE_URL}${redirectTo}`);
+            res.redirect(
+              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
+            );
           })
           .catch(() => {
-            res.redirect(`${process.env.SITE_URL}${redirectTo}`);
+            res.redirect(
+              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
+            );
           });
       })
       .catch(() => {
         //create user
         console.log("adding a user");
         addUser({ user })
-          .then(() => res.redirect(`${process.env.SITE_URL}${redirectTo}`))
-          .catch(() => res.redirect(`${process.env.SITE_URL}${redirectTo}`));
+          .then(() =>
+            res.redirect(
+              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
+            )
+          )
+          .catch(() =>
+            res.redirect(
+              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
+            )
+          );
       });
   }
 );
