@@ -78,7 +78,7 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:3001",
-      "https://laughing-williams-8517be.netlify.app/",
+      "https://northmanlysquash-v2.netlify.app",
     ],
   })
 );
