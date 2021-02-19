@@ -76,7 +76,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:3001"],
+    origin: [
+      "http://localhost:3001",
+      "https://laughing-williams-8517be.netlify.app/",
+    ],
   })
 );
 
