@@ -29,8 +29,9 @@ router.get(
   }),
   (req, res) => {
     //update or add user
-    const { user, cookies } = req;
-    const redirectTo = req.session.redirect ? req.session.redirect : "/";
+    const { user, cookies, session } = req;
+    const redirectTo = session.redirect ? session.redirect : "/";
+    console.log("redirecting to this ", redirectTo);
 
     getUser(user)
       .then(() => {
