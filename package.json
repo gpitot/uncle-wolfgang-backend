@@ -7,7 +7,7 @@
     "dev": "npm run watch ./src/bin/www",
     "prod": "NODE_ENV=production node ./dist/bin/www",
     "build-old": "npm run clean && babel ./src --out-dir dist",
-    "build": "npm run clean-backend && babel ./src --out-dir dist && mv frontend_build dist/frontend",
+    "build": "npm run clean-backend && babel ./src --out-dir dist",
     "clean-backend": "rimraf dist",
     "watch": "nodemon --config ./nodemon.json --",
     "heroku-postbuild": "npm run build"

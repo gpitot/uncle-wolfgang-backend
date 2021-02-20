@@ -9,7 +9,6 @@ import http from "http";
 import expressSession from "express-session";
 import apiRouter from "./routes-api";
 import authRouter from "./routes-auth";
-import path from "path";
 
 require("dotenv").config();
 
@@ -79,25 +78,9 @@ app.use(
     origin: [
       "http://localhost:3001",
       "https://northmanlysquash-v2.netlify.app",
+      "https://6030ad0f4b6bfa0007e7ed01--northmanlysquash-v2.netlify.app",
     ],
   })
-);
-
-app.use(express.static(path.join(__dirname, "/frontend")));
-
-app.get(
-  [
-    "/",
-    "/social",
-    "/event/*",
-    "/competition",
-    "/competition/*",
-    "/coaching",
-    "/shop",
-  ],
-  (req, res) => {
-    res.sendFile(path.join(__dirname, "/frontend/index.html"));
-  }
 );
 
 app.use("/api", apiRouter);
