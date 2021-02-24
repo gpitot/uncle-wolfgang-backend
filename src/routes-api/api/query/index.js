@@ -66,12 +66,26 @@ router.get("/", async (req, res) => {
   // }
   // console.log(a);
 
-  const b = `
-  select * from events;
-  `;
+  // const hr = 1000 * 60 * 60;
+  // const d = hr * 24;
+  // const s = 1614585600000 - hr; //6pm
+  // const s1 = s + hr; //7pm
+  // const s2 = s1 + hr * 2.5; //830pm
+  // const o = s - d * 10;
+
+  // console.log(s, s1, s2, o);
+
+  // const b = `
+  // insert into events (name, description, spots, start, open) values
+  //     ('Monday coaching', 'Monday Coaching from 6pm. $10 for an hour with world class coaches', 8, ${s}, ${o}),
+  //     ('Monday session 1', 'Monday Social from 7 to 830pm. $17.50 available to all skill levels.', 9, ${s1}, ${o}),
+  //     ('Monday session 2', 'Monday Social from 830 to 10pm. $17.50 available to all skill levels.', 9, ${s2}, ${o})
+  // `;
+
+  const c = "select * from LADDER_MATCHES";
 
   //2020-12-19T08:16:04.714Z"
-  query(b)
+  query(c)
     .then((result) => {
       res.send({
         result: result.rows,

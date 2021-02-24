@@ -9,7 +9,6 @@ import http from "http";
 import expressSession from "express-session";
 import apiRouter from "./routes-api";
 import authRouter from "./routes-auth";
-
 require("dotenv").config();
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_SECRET } = process.env;

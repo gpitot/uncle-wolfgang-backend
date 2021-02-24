@@ -7,7 +7,6 @@ const getUser = ({ id }) => {
    from users 
    where id = $1
   `;
-  //const sql = `SELECT *, now() FROM events;`;
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -26,7 +25,7 @@ const addUser = ({ user }) => {
   const {
     _json: { given_name, family_name, picture, email, sub },
   } = user;
-  //const sql = `SELECT *, now() FROM events;`;
+
   return new Promise((resolve, reject) => {
     query(sql, [sub, email, given_name, family_name, picture])
       .then(() => {
@@ -50,7 +49,7 @@ const updateUser = ({ user }) => {
   const {
     _json: { given_name, family_name, picture, email, sub },
   } = user;
-  //const sql = `SELECT *, now() FROM events;`;
+
   return new Promise((resolve, reject) => {
     query(sql, [email, given_name, family_name, picture, sub])
       .then(() => {

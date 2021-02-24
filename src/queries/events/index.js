@@ -7,7 +7,6 @@ const getEvent = ({ id }) => {
    from events 
    where events.id = $1
   `;
-  //const sql = `SELECT *, now() FROM events;`;
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -19,10 +18,11 @@ const getEvent = ({ id }) => {
 
 const getEvents = () => {
   //for some reason needs to add 11 hours because it takes 11 off the now ?
-  const sql = `SELECT *, current_timestamp FROM events
-  where start >= now() + '11 hour'::interval and open <= now() + '11 hour'::interval`;
+  const currentEpoch = Date.now();
+  const sql = `SELECT * FROM events
+  where start >= $1 and open <= $1`;
   return new Promise((resolve, reject) => {
-    query(sql)
+    query(sql, [currentEpoch])
       .then((data) => {
         resolve(data.rows);
       })

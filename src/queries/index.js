@@ -1,5 +1,5 @@
-import { Pool } from 'pg';
-import database from './database';
+import { Pool } from "pg";
+import database from "./database";
 const pool = new Pool({
   connectionString: database,
 

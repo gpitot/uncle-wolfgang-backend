@@ -17,7 +17,8 @@ const getMatches = ({
   challenges = false,
 }) => {
   //with playerid gets challenges for that player
-  const args = [ladder_id];
+  const currentEpoch = Date.now();
+  const args = [ladder_id, currentEpoch];
 
   let sql = `
   SELECT LADDER_MATCHES.id,
@@ -47,17 +48,17 @@ const getMatches = ({
 
   const onlyChallenges =
     challenges === "true"
-      ? "(MATCH_DATE is null or MATCH_DATE > now())"
-      : "MATCH_DATE < now() and approved = true";
+      ? "(MATCH_DATE is null or MATCH_DATE > $2)"
+      : "MATCH_DATE < $2 and approved = true";
 
   sql += onlyChallenges;
 
   if (player_id) {
     sql += `
     and (
-      player_1 = $2
+      player_1 = $3
       or
-      player_2 = $2
+      player_2 = $3
   )
     `;
     args.push(player_id);
@@ -101,6 +102,7 @@ const getRanks = ({ ladder_id }) => {
 };
 
 const addChallenge = ({ ladder_id, player_1, player_2 }) => {
+  const currentEpoch = Date.now();
   const sql = `
     insert into ladder_matches (
         ladder_id,
@@ -112,7 +114,7 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
         $1,
         $2,
         $3,
-        now()
+        $4
     )
     `;
 
@@ -136,7 +138,7 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
         if (data.rows.length > 0) {
           reject("Challenge already exists");
         } else {
-          query(sql, [ladder_id, player_1, player_2])
+          query(sql, [ladder_id, player_1, player_2, currentEpoch])
             .then((data) => {
               resolve(data.rows);
             })

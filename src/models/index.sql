@@ -3,15 +3,15 @@ CREATE TABLE events (
     name VARCHAR(30) NOT NULL,
     description VARCHAR(400) NOT NULL,
     spots integer NOT NULL,
-    start timestamp NOT NULL,
-    open timestamp NOT NULL,
+    start bigint NOT NULL,
+    open bigint NOT NULL,
     enabled BOOLEAN not null DEFAULT TRUE
 )
 
 CREATE TABLE user_events (
     id SERIAL PRIMARY KEY,
     user_id VARCHAR(100) references users(id),
-    registered timestamp NOT NULL,
+    registered bigint NOT NULL,
     event_id integer references events(id),
     paid BOOLEAN not null default false,
     receipt varchar(100) default null,
@@ -46,8 +46,8 @@ CREATE TABLE LADDER_MATCHES (
     ladder_id integer references ladders(id),
     player_1 VARCHAR(100) references users(id),
     player_2 VARCHAR(100) references users(id),
-    challenge_date timestamp not null,
-    match_date timestamp default null,
+    challenge_date bigint not null,
+    match_date bigint default null,
     player_2_games integer default null,
     player_1_games integer default null,
     player_1_paid BOOLEAN DEFAULT FALSE,

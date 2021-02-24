@@ -78,22 +78,24 @@ const removeSelfUserEvent = ({ id, user }) => {
 };
 
 const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
+  const currentEpoch = Date.now();
+
   const checkEventStartStopSql = `
   SELECT 
   events.spots, events.start, events.open, events.enabled as event_enabled, user_events.user_id, user_events.enabled as user_event_enabled
    from events left join user_events on events.id = user_events.event_id
-   where events.id = $1 and events.start >= now() + '11 hour'::interval and events.open <= now() + '11 hour'::interval
+   where events.id = $1 and events.start >= $2 and events.open <= $2
    and events.enabled = true;
   `;
 
   const addUserEventSql = `
   INSERT INTO user_events (user_id, registered, event_id, paid, receipt)
-   VALUES ($1, now(), $2, $3, $4)
+   VALUES ($1, $2, $2, $3, $5)
    returning *;
   `;
 
   return new Promise((resolve, reject) => {
-    query(checkEventStartStopSql, [event_id])
+    query(checkEventStartStopSql, [event_id, currentEpoch])
       .then((data) => {
         //check start and open
         if (data.rows.length === 0) {
@@ -118,7 +120,7 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
           );
         }
 
-        query(addUserEventSql, [user_id, event_id, paid, receipt])
+        query(addUserEventSql, [user_id, currentEpoch, event_id, paid, receipt])
           .then((data) => resolve(data.rows[0]))
           .catch((err) => reject(err));
       })
