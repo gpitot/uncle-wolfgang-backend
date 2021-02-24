@@ -4,6 +4,7 @@ const authenticateUser = (req, res, next) => {
   const { user } = req;
   if (user === undefined) {
     req.session.redirect = req.headers.preauthurl;
+    console.log("setting session redirect to ", req.headers.preauthurl);
     return res.status(405).send("/auth/login/google");
   }
   next();
