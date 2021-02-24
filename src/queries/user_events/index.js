@@ -90,7 +90,7 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
 
   const addUserEventSql = `
   INSERT INTO user_events (user_id, registered, event_id, paid, receipt)
-   VALUES ($1, $2, $2, $3, $5)
+   VALUES ($1, $2, $3, $4, $5)
    returning *;
   `;
 
