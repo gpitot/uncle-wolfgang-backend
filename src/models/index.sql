@@ -64,3 +64,26 @@ CREATE TABLE LADDER_RANKS (
     recent_change integer default 0,
     UNIQUE (ladder_id, player_id)
 )
+
+
+
+
+-- shop
+CREATE TABLE SHOP (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    description VARCHAR(100),
+    image VARCHAR(250),
+    category VARCHAR(40),
+    price decimal not null,
+    discount integer default 0,
+    stock integer default 100
+)
+
+CREATE TABLE TRANSACTIONS (
+    id SERIAL PRIMARY KEY,
+    item integer references SHOP(id),
+    purchaser VARCHAR(100) references USERS(id),
+    purchase_date bigint not null,
+    payment_status VARCHAR(20) default 'pending'
+)

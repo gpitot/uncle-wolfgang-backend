@@ -31,37 +31,27 @@ router.get(
     //update or add user
     const { user, cookies, session } = req;
     const redirectTo = session.redirect ? session.redirect : "/";
-    console.log("redirecting to this ", redirectTo);
-
+    console.log("---------------------------------");
+    console.log(cookies);
+    console.log("---------------------------------");
+    const redirectUrl = `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`;
     getUser(user)
       .then(() => {
         //update user
         updateUser({ user })
           .then(() => {
-            res.redirect(
-              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
-            );
+            res.redirect(redirectUrl);
           })
           .catch(() => {
-            res.redirect(
-              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
-            );
+            res.redirect(redirectUrl);
           });
       })
       .catch(() => {
         //create user
         console.log("adding a user");
         addUser({ user })
-          .then(() =>
-            res.redirect(
-              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
-            )
-          )
-          .catch(() =>
-            res.redirect(
-              `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`
-            )
-          );
+          .then(() => res.redirect(redirectUrl))
+          .catch(() => res.redirect(redirectUrl));
       });
   }
 );

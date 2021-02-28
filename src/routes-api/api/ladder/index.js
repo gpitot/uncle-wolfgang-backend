@@ -9,6 +9,7 @@ import {
   submitResult,
   approveResult,
   signUp,
+  getUpcomingMatches,
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -17,6 +18,21 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   getLadders()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch(() => {
+      res.send({
+        success: false,
+      });
+    });
+});
+
+router.get("/upcoming", async (req, res) => {
+  getUpcomingMatches()
     .then((result) => {
       res.send({
         success: true,

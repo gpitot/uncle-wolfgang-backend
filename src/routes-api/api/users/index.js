@@ -19,8 +19,10 @@ router.get("/me", async (req, res) => {
         },
       });
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
+      res.send({
+        success: false,
+      });
     });
 });
 
