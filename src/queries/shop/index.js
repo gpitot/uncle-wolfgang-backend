@@ -1,11 +1,12 @@
 import { query } from "../query";
 
-const getShop = () => {
+const getShop = ({ category }) => {
   const sql = `
-      select * from shop
+      select * from shop where category = $1
       `;
+  // console.logcategory;
   return new Promise((resolve, reject) => {
-    query(sql)
+    query(sql, [category])
       .then((data) => {
         resolve(data.rows);
       })

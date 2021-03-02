@@ -1,24 +1,35 @@
 import express from "express";
-import { getShop, getTransactions } from "../../../queries/shop";
+//import fetch from "node-fetch";
+import { v4 as uuidv4 } from "uuid";
+
+import {
+  getShop,
+  addTransaction,
+  getTransactions,
+} from "../../../queries/shop";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  getShop()
-    .then((result) => {
-      res.send({
-        success: true,
-        result,
+router.get(
+  "/",
+  (req, res, next) => validateRequest(["category"], req.query, res, next),
+  async (req, res) => {
+    getShop({ ...req.query })
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+        });
       });
-    })
-    .catch(() => {
-      res.send({
-        success: false,
-      });
-    });
-});
+  }
+);
 
 router.get("/transactions", authenticateAdmin, async (req, res) => {
   getTransactions()
@@ -37,10 +48,10 @@ router.get("/transactions", authenticateAdmin, async (req, res) => {
 
 router.post(
   "/transactions",
-  (req, res, next) => validateRequest(["item_id"], req.body, res, next),
+  (req, res, next) => validateRequest(["itemId"], req.body, res, next),
   authenticateUser,
   async (req, res) => {
-    getTransactions({
+    addTransaction({
       ...req.body,
       userId: req.user.id,
     })
@@ -57,5 +68,44 @@ router.post(
       });
   }
 );
+
+router.post("/payment", authenticateUser, async (req, res) => {
+  const { amount, nonce } = req.body;
+
+  console.log(req.user);
+
+  const data = {
+    source_id: nonce,
+    idempotency_key: uuidv4(),
+    amount_money: {
+      amount: amount,
+      currency: "AUD",
+    },
+    //buyer_email_address : req.user.
+  };
+
+  console.log(data);
+  return res.send({ success: true });
+
+  // fetch("https://connect.squareupsandbox.com/v2/payments", {
+  //   method: "POST",
+  //   body: JSON.stringify(data),
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization:
+  //       "Bearer EAAAEPP6ynlEVJIigMMHMrLnoEhYWl1-sIIMqoEmDDl3rkkb9AWkeDKpmQA6lSqG",
+  //     Accept: "application/json",
+  //     "Square-Version": "2021-02-26",
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     res.send({ success: true });
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     res.send({ success: false });
+  //   });
+});
 
 export default router;

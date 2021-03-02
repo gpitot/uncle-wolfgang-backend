@@ -25,7 +25,7 @@ router.get("/logout", (req, res) => {
 router.get(
   "/callback/google",
   passport.authenticate("google", {
-    failureRedirect: "/",
+    failureRedirect: `${process.env.SITE_URL}/loginerror`,
   }),
   (req, res) => {
     //update or add user
@@ -33,6 +33,7 @@ router.get(
     const redirectTo = session.redirect ? session.redirect : "/";
     console.log("---------------------------------");
     console.log(cookies);
+    console.log("REDIRECT TO : ", redirectTo);
     console.log("---------------------------------");
     const redirectUrl = `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`;
     getUser(user)
@@ -51,7 +52,11 @@ router.get(
         console.log("adding a user");
         addUser({ user })
           .then(() => res.redirect(redirectUrl))
-          .catch(() => res.redirect(redirectUrl));
+          .catch((err) => {
+            console.log("loginerror");
+            console.log(err);
+            res.redirect(`${process.env.SITE_URL}/loginerror`);
+          });
       });
   }
 );
