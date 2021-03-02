@@ -31,6 +31,7 @@ router.get(
     //update or add user
     const { user, cookies, session } = req;
     const redirectTo = session.redirect ? session.redirect : "/";
+    delete session.redirect;
     console.log("---------------------------------");
     console.log(cookies);
     console.log("REDIRECT TO : ", redirectTo);
