@@ -60,8 +60,8 @@ app.use(setCookiePassport);
 app.use(
   expressSession({
     secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
   })
 );
 app.use(passport.initialize());
