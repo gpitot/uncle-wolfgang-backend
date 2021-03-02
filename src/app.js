@@ -47,6 +47,8 @@ passport.deserializeUser((obj, cb) => {
 app.use(cookieParser());
 
 const setCookiePassport = (req, res, next) => {
+  console.log("-----------");
+  console.log("set cookie passport : ", req.headers.authcookie);
   if (req.headers.authcookie) {
     req.cookies["connect.sid"] = req.headers.authcookie;
     //req.headers.cookie = req.headers.authcookie.replace(":", "%3A");
