@@ -1,5 +1,5 @@
 import express from "express";
-//import fetch from "node-fetch";
+import fetch from "node-fetch";
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -72,8 +72,6 @@ router.post(
 router.post("/payment", authenticateUser, async (req, res) => {
   const { amount, nonce } = req.body;
 
-  console.log(req.user);
-
   const data = {
     source_id: nonce,
     idempotency_key: uuidv4(),
@@ -81,31 +79,29 @@ router.post("/payment", authenticateUser, async (req, res) => {
       amount: amount,
       currency: "AUD",
     },
-    //buyer_email_address : req.user.
   };
 
   console.log(data);
-  return res.send({ success: true });
 
-  // fetch("https://connect.squareupsandbox.com/v2/payments", {
-  //   method: "POST",
-  //   body: JSON.stringify(data),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization:
-  //       "Bearer EAAAEPP6ynlEVJIigMMHMrLnoEhYWl1-sIIMqoEmDDl3rkkb9AWkeDKpmQA6lSqG",
-  //     Accept: "application/json",
-  //     "Square-Version": "2021-02-26",
-  //   },
-  // })
-  //   .then((response) => response.json())
-  //   .then((data) => {
-  //     res.send({ success: true });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     res.send({ success: false });
-  //   });
+  fetch("https://connect.squareupsandbox.com/v2/payments", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer EAAAEPP6ynlEVJIigMMHMrLnoEhYWl1-sIIMqoEmDDl3rkkb9AWkeDKpmQA6lSqG",
+      Accept: "application/json",
+      "Square-Version": "2021-02-26",
+    },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      res.send({ success: true, result });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ success: false });
+    });
 });
 
 export default router;
