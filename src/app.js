@@ -2,13 +2,13 @@ import express from "express";
 import passport from "passport";
 import { Strategy } from "passport-google-oauth20";
 import cookieParser from "cookie-parser";
-import logger from "morgan";
 import config from "config";
 import cors from "cors";
 import http from "http";
 import expressSession from "express-session";
 import apiRouter from "./routes-api";
 import authRouter from "./routes-auth";
+// eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_SECRET } = process.env;
@@ -69,7 +69,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
