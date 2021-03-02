@@ -2,6 +2,7 @@ import { getUser } from "../queries/users/index";
 
 const authenticateUser = (req, res, next) => {
   const { user } = req;
+  console.log(user);
   if (user === undefined) {
     req.session.redirect = req.headers.preauthurl;
     console.log("setting session redirect to ", req.headers.preauthurl);
