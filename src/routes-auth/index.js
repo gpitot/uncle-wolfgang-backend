@@ -37,6 +37,11 @@ router.get(
     console.log("REDIRECT TO : ", redirectTo);
     console.log("---------------------------------");
     const redirectUrl = `${process.env.SITE_URL}${redirectTo}?cookie=${cookies["connect.sid"]}`;
+    //const redirectUrl = `${process.env.SITE_URL}${redirectTo}`;
+    res.cookie("authCookie", cookies["connect.sid"], {
+      maxAge: 90000,
+      httpOnly: true,
+    });
     getUser(user)
       .then(() => {
         //update user
