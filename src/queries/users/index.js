@@ -26,6 +26,8 @@ const login = (req) => {
           // result == true
           if (result) {
             resolve({ id, email, firstname, lastname, photo, role });
+          } else {
+            reject("incorrect password");
           }
         });
       })
