@@ -94,7 +94,7 @@ router.post(
     ),
   authenticateUser,
   async (req, res) => {
-    const player_1 = req.user.id;
+    const player_1 = req.user.email;
     addChallenge({
       ...req.body,
       ...req.params,
@@ -119,7 +119,7 @@ router.put(
   (req, res, next) => validateRequest(["match_id"], req.body, res, next),
   authenticateUser,
   async (req, res) => {
-    const player_2 = req.user.id;
+    const player_2 = req.user.email;
     acceptChallenge({
       ...req.body,
       player_2,
@@ -169,7 +169,7 @@ router.put(
     ),
   authenticateUser,
   async (req, res) => {
-    const player_1 = req.user.id;
+    const player_1 = req.user.email;
     submitResult({ ...req.body, player_1 })
       .then((result) => {
         res.send({
@@ -219,7 +219,7 @@ router.post(
   (req, res, next) => validateRequest(["ladder_id"], req.body, res, next),
   authenticateUser,
   async (req, res) => {
-    const player_id = req.user.id;
+    const player_id = req.user.email;
     signUp({ ...req.body, player_id })
       .then(() => {
         res.send({

@@ -53,7 +53,7 @@ router.post(
   async (req, res) => {
     addTransaction({
       ...req.body,
-      userId: req.user.id,
+      userId: req.user.email,
     })
       .then((result) => {
         res.send({

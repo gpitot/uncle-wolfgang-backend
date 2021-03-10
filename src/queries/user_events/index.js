@@ -7,13 +7,13 @@ const getUsers = ({ event_id }) => {
     user_events.event_id,
     user_events.enabled,
     user_events.paid,
-    users.id as user_id,
+    users.email as email,
     users.firstname,
     users.lastname,
     users.photo
     
     FROM user_events left join users
-    on user_events.user_id = users.id
+    on user_events.user_id = users.email
     WHERE event_id = $1
     and enabled = true
     order by user_events.registered;
@@ -47,7 +47,6 @@ const updateUserEvent = ({ id, event_id, paid, enabled }) => {
 };
 
 const removeSelfUserEvent = ({ id, user }) => {
-  console.log(id, user.id);
   const getValidUser = `
     select * from user_events where id = $1 and user_id = $2;
   `;
@@ -59,7 +58,7 @@ const removeSelfUserEvent = ({ id, user }) => {
    `;
 
   return new Promise((resolve, reject) => {
-    query(getValidUser, [id, user.id])
+    query(getValidUser, [id, user.email])
       .then((data) => {
         if (data.rows.length === 0) {
           return reject("Invalid user tried to delete user_event");

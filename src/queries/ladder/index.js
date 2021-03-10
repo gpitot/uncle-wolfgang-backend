@@ -40,8 +40,8 @@ const getMatches = ({
   player_2_users.lastname as player_2_lastname, 
   player_2_users.photo as player_2_photo
    FROM LADDER_MATCHES 
-   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
-   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.email
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.email
    WHERE
 
    `;
@@ -82,12 +82,12 @@ const getRanks = ({ ladder_id }) => {
   const sql = `select 
     ladder_ranks.player_id,
     ladder_ranks.recent_change,
-    users.id,
+    users.email,
     users.firstname,
     users.lastname,
     users.photo
     from ladder_ranks 
-    inner join users on ladder_ranks.player_id = users.id
+    inner join users on ladder_ranks.player_id = users.email
     where ladder_id = $1
     order by rank DESC;
     `;
@@ -435,8 +435,8 @@ const getUpcomingMatches = () => {
   player_2_users.lastname as player_2_lastname, 
   player_2_users.photo as player_2_photo
    FROM LADDER_MATCHES 
-   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
-   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.email
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.email
    WHERE
    LADDER_MATCHES.match_date > $1
    ORDER BY LADDER_MATCHES.match_date ASC`;

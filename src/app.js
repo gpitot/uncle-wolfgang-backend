@@ -1,17 +1,14 @@
 import express from "express";
-import passport from "passport";
-import { Strategy } from "passport-google-oauth20";
 import cookieParser from "cookie-parser";
 import config from "config";
 import cors from "cors";
 import http from "http";
 import expressSession from "express-session";
 import apiRouter from "./routes-api";
-import authRouter from "./routes-auth";
 // eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_SECRET } = process.env;
+const { SESSION_SECRET } = process.env;
 
 const app = express();
 
@@ -23,41 +20,7 @@ if (!config.get("myprivatekey")) {
   process.exit(1);
 }
 
-passport.use(
-  new Strategy(
-    {
-      clientID: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/callback/google",
-    },
-    (accessToken, refreshToken, profile, cb) => {
-      return cb(null, profile);
-    }
-  )
-);
-
-passport.serializeUser((user, cb) => {
-  cb(null, user);
-});
-
-passport.deserializeUser((obj, cb) => {
-  cb(null, obj);
-});
-
 app.use(cookieParser());
-
-const setCookiePassport = (req, res, next) => {
-  console.log("-----------");
-  console.log("set cookie passport : ", req.headers.authcookie);
-  if (req.headers.authcookie) {
-    req.cookies["connect.sid"] = req.headers.authcookie;
-    //req.headers.cookie = req.headers.authcookie.replace(":", "%3A");
-  }
-
-  next();
-};
-
-app.use(setCookiePassport);
 
 app.use(
   expressSession({
@@ -66,8 +29,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -84,7 +45,6 @@ app.use(
 );
 
 app.use("/api", apiRouter);
-app.use("/auth", authRouter);
 
 export { server };
 export default app;

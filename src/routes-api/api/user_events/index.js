@@ -79,7 +79,7 @@ router.post(
   authenticateUser,
   async (req, res) => {
     addUserEvent({
-      user_id: req.user.id,
+      user_id: req.user.email,
       event_id: req.body.event_id,
     })
       .then((result) => {
