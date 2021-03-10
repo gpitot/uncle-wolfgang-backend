@@ -46,11 +46,8 @@ router.get("/upcoming", async (req, res) => {
     });
 });
 
-router.get("/:ladder_id/matches", async (req, res) => {
-  getMatches({
-    ...req.params,
-    ...req.query,
-  })
+router.get("/matches", async (req, res) => {
+  getMatches(req.query)
     .then((result) => {
       res.send({
         success: true,
@@ -94,7 +91,7 @@ router.post(
     ),
   authenticateUser,
   async (req, res) => {
-    const player_1 = req.user.email;
+    const player_1 = req.user.id;
     addChallenge({
       ...req.body,
       ...req.params,
@@ -119,7 +116,7 @@ router.put(
   (req, res, next) => validateRequest(["match_id"], req.body, res, next),
   authenticateUser,
   async (req, res) => {
-    const player_2 = req.user.email;
+    const player_2 = req.user.id;
     acceptChallenge({
       ...req.body,
       player_2,
@@ -169,7 +166,7 @@ router.put(
     ),
   authenticateUser,
   async (req, res) => {
-    const player_1 = req.user.email;
+    const player_1 = req.user.id;
     submitResult({ ...req.body, player_1 })
       .then((result) => {
         res.send({
@@ -219,7 +216,7 @@ router.post(
   (req, res, next) => validateRequest(["ladder_id"], req.body, res, next),
   authenticateUser,
   async (req, res) => {
-    const player_id = req.user.email;
+    const player_id = req.user.id;
     signUp({ ...req.body, player_id })
       .then(() => {
         res.send({

@@ -12,13 +12,13 @@ const getLadders = () => {
 };
 
 const getMatches = ({
-  ladder_id,
+  ladder_id = undefined,
   player_id = undefined,
   challenges = false,
 }) => {
   //with playerid gets challenges for that player
   const currentEpoch = Date.now();
-  const args = [ladder_id, currentEpoch];
+  const args = [currentEpoch];
 
   let sql = `
   SELECT LADDER_MATCHES.id,
@@ -40,35 +40,38 @@ const getMatches = ({
   player_2_users.lastname as player_2_lastname, 
   player_2_users.photo as player_2_photo
    FROM LADDER_MATCHES 
-   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.email
-   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.email
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
    WHERE
 
    `;
 
   const onlyChallenges =
     challenges === "true"
-      ? "(MATCH_DATE is null or MATCH_DATE > $2)"
-      : "MATCH_DATE < $2 and approved = true";
+      ? "(MATCH_DATE is null or MATCH_DATE > $1)"
+      : "MATCH_DATE < $1 and approved = true";
 
   sql += onlyChallenges;
 
   if (player_id) {
     sql += `
     and (
-      player_1 = $3
+      player_1 = $2
       or
-      player_2 = $3
+      player_2 = $2
   )
     `;
     args.push(player_id);
   }
 
+  if (ladder_id) {
+    args.push(ladder_id);
+    sql += ` and ladder_id = $${args.length}`;
+  }
+
   sql += `
-  and ladder_id = $1
     order by match_date DESC, challenge_date DESC;
     `;
-
   return new Promise((resolve, reject) => {
     query(sql, args)
       .then((data) => {
@@ -80,14 +83,13 @@ const getMatches = ({
 
 const getRanks = ({ ladder_id }) => {
   const sql = `select 
-    ladder_ranks.player_id,
     ladder_ranks.recent_change,
-    users.email,
+    users.id,
     users.firstname,
     users.lastname,
     users.photo
     from ladder_ranks 
-    inner join users on ladder_ranks.player_id = users.email
+    inner join users on ladder_ranks.user_id = users.id
     where ladder_id = $1
     order by rank DESC;
     `;
@@ -254,7 +256,7 @@ const approveResult = ({ match_id }) => {
 const MAX_RANK = 10000;
 const changeRank = ({ ladder_id, winner, loser }) => {
   const sqlGetRanksLean = `
-    SELECT player_id, rank from LADDER_RANKS
+    SELECT user_id, rank from LADDER_RANKS
     where ladder_id = $1
     order by rank DESC;
     `;
@@ -298,7 +300,7 @@ const changeRank = ({ ladder_id, winner, loser }) => {
     UPDATE LADDER_RANKS
     set rank = $1
     where
-    player_id = $2
+    user_id = $2
     and ladder_id = $3;
     `;
 
@@ -328,14 +330,14 @@ const changeRank = ({ ladder_id, winner, loser }) => {
       //that is winner new rank
 
       for (let i = 0; i < rows.length; i += 1) {
-        const { player_id } = rows[i];
+        const { user_id } = rows[i];
 
         //if you find winner before loser then they are already above and stay in position
-        if (player_id === winner) {
+        if (user_id === winner) {
           winnerIndex = i;
         }
 
-        if (player_id === loser) {
+        if (user_id === loser) {
           loserIndex = i;
         }
       }
@@ -351,7 +353,7 @@ const changeRank = ({ ladder_id, winner, loser }) => {
         moveWinnerAboveLoser(rows);
         sql = `
             INSERT INTO LADDER_RANKS
-            (ladder_id, player_id, rank)
+            (ladder_id, user_id, rank)
             values ($3, $2, $1);
         `;
       } else {
@@ -400,7 +402,7 @@ const getBottomRank = (ladder_id) => {
 
 const signUp = ({ ladder_id, player_id }) => {
   const sql = `
-    INSERT INTO LADDER_RANKS (ladder_id, player_id, rank) VALUES (
+    INSERT INTO LADDER_RANKS (ladder_id, user_id, rank) VALUES (
       $1, $2, $3
     );
   `;
@@ -435,8 +437,8 @@ const getUpcomingMatches = () => {
   player_2_users.lastname as player_2_lastname, 
   player_2_users.photo as player_2_photo
    FROM LADDER_MATCHES 
-   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.email
-   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.email
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
    WHERE
    LADDER_MATCHES.match_date > $1
    ORDER BY LADDER_MATCHES.match_date ASC`;

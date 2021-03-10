@@ -14,6 +14,7 @@ const login = (req) => {
       .then((data) => {
         if (data.rows.length === 0) return reject("No user exists");
         const {
+          id,
           email,
           password: hashedPassword,
           firstname,
@@ -24,7 +25,7 @@ const login = (req) => {
         bcrypt.compare(req.password, hashedPassword, function (err, result) {
           // result == true
           if (result) {
-            resolve({ email, firstname, lastname, photo, role });
+            resolve({ id, email, firstname, lastname, photo, role });
           }
         });
       })
@@ -41,7 +42,8 @@ const addUser = ({
 }) => {
   const sql = `
   INSERT INTO USERS (email, password, firstname, lastname, photo)
-  VALUES ($1, $2, $3, $4, $5);
+  VALUES ($1, $2, $3, $4, $5)
+  returning *;
   `;
 
   return new Promise((resolve, reject) => {
@@ -52,8 +54,9 @@ const addUser = ({
       }
 
       query(sql, [email, hash, firstname, lastname, photo])
-        .then(() => {
-          resolve({ email, firstname, lastname, photo, role: "user" });
+        .then((data) => {
+          const { id, email, firstname, lastname, photo, role } = data.rows[0];
+          resolve({ id, email, firstname, lastname, photo, role });
         })
         .catch((qerr) => reject(qerr));
     });
@@ -69,9 +72,9 @@ const updateUser = ({ user }) => {
   firstname = $2,
   lastname = $3,
   photo = $4
-  where email = $5
+  where id = $5
   `;
-  const { email, password, firstname, lastname, photo } = user;
+  const { id, password, firstname, lastname, photo } = user;
 
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, saltRounds, function (err, hash) {
@@ -80,7 +83,7 @@ const updateUser = ({ user }) => {
         return reject(err);
       }
 
-      query(sql, [hash, firstname, lastname, photo, email])
+      query(sql, [hash, firstname, lastname, photo, id])
         .then(() => {
           resolve();
         })

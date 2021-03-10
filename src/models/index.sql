@@ -1,5 +1,6 @@
 CREATE TABLE users (
-    email VARCHAR(100) PRIMARY KEY NOT NULL,
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100),
     firstname VARCHAR(30) NOT NULL,
     lastname VARCHAR(30) NOT NULL,
@@ -21,7 +22,7 @@ CREATE TABLE events (
 
 CREATE TABLE user_events (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(100) references users(email) not null,
+    user_id integer references users(id) not null,
     registered bigint NOT NULL,
     event_id integer references events(id) not null,
     paid BOOLEAN not null default false,
@@ -45,8 +46,8 @@ CREATE TABLE LADDERS (
 CREATE TABLE LADDER_MATCHES (
     id SERIAL PRIMARY KEY,
     ladder_id integer references ladders(id) not null,
-    player_1 VARCHAR(100) references users(email) not null,
-    player_2 VARCHAR(100) references users(email) not null,
+    player_1 integer references users(id) not null,
+    player_2 integer references users(id) not null,
     challenge_date bigint not null,
     match_date bigint default null,
     player_2_games integer default null,
@@ -60,10 +61,10 @@ CREATE TABLE LADDER_MATCHES (
 CREATE TABLE LADDER_RANKS (
     id SERIAL PRIMARY KEY,
     ladder_id integer references ladders(id) not null,
-    player_id VARCHAR(100) references users(email) not null,
+    user_id integer references users(id) not null,
     rank decimal not null,
     recent_change integer default 0,
-    UNIQUE (ladder_id, player_id)
+    UNIQUE (ladder_id, user_id)
 );
 
 
@@ -84,7 +85,7 @@ CREATE TABLE SHOP (
 CREATE TABLE TRANSACTIONS (
     id SERIAL PRIMARY KEY,
     item integer references SHOP(id) not null,
-    purchaser VARCHAR(100) references users(email) not null,
+    user_id integer references users(id) not null,
     purchase_date bigint not null,
     payment_status VARCHAR(20) default 'pending'
 );
