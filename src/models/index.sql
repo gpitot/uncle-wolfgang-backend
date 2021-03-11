@@ -80,7 +80,8 @@ CREATE TABLE SHOP (
     category VARCHAR(40),
     price decimal not null,
     discount integer default 0,
-    stock integer default 100
+    stock integer default 100,
+    link VARCHAR(100)
 );
 
 CREATE TABLE TRANSACTIONS (
