@@ -76,16 +76,71 @@ const removeSelfUserEvent = ({ id, user }) => {
   });
 };
 
-const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
+const eventIsOpenToEntries = (event_id) => {
+  const sql = ` 
+    select start, open, enabled, spots from events where id = $1; 
+  `;
   const currentEpoch = Date.now();
 
-  const checkEventStartStopSql = `
-  SELECT 
-  events.spots, events.start, events.open, events.enabled as event_enabled, user_events.user_id, user_events.enabled as user_event_enabled
-   from events left join user_events on events.id = user_events.event_id
-   where events.id = $1 and events.start >= $2 and events.open <= $2
-   and events.enabled = true;
+  return new Promise((resolve, reject) => {
+    query(sql, [event_id])
+      .then((data) => {
+        const { start, open, enabled, spots } = data.rows[0];
+        if (currentEpoch > start) {
+          reject("Event has already started");
+        }
+
+        if (currentEpoch < open) {
+          reject("Event is not open yet");
+        }
+
+        if (enabled === false) {
+          reject("Event is no longer enabled");
+        }
+
+        resolve(spots);
+      })
+      .catch((err) => {
+        console.log("error 1");
+        console.log(err);
+        reject("An unknown error occurred #1");
+      });
+  });
+};
+
+const eventHasSpace = (event_id, spots) => {
+  const sql = ` 
+    select user_id from user_events where event_id = $1 
   `;
+
+  return new Promise((resolve, reject) => {
+    query(sql, [event_id])
+      .then((data) => {
+        if (data.length >= spots) {
+          reject("Event is full");
+        }
+        resolve();
+      })
+      .catch((err) => {
+        console.log("error 2");
+        console.log(err);
+        reject("An unknown error occurred #2");
+      });
+  });
+};
+
+const enableUserEvent = (event_id, user_id) => {
+  const sql = `
+    update user_events 
+    set enabled = true 
+    where event_id = $1 
+    and user_id = $2
+    returning *`;
+  return query(sql, [event_id, user_id]);
+};
+
+const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
+  const currentEpoch = Date.now();
 
   const addUserEventSql = `
   INSERT INTO user_events (user_id, registered, event_id, paid, receipt)
@@ -94,36 +149,41 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
   `;
 
   return new Promise((resolve, reject) => {
-    query(checkEventStartStopSql, [event_id, currentEpoch])
-      .then((data) => {
-        //check start and open
-        if (data.rows.length === 0) {
-          // no event id here
-          return reject(`Event ${event_id} does not exist`);
-        }
-        const { spots, enabled } = data.rows[0];
-        if (enabled === false) {
-          return reject(`Event ${event_id} is not enabled`);
-        }
-
-        //count all entries that are enabled
-        let enabledEntries = 0;
-        for (let i = 0; i < data.rows.length; i += 1) {
-          if (data.rows[i].user_event_enabled === true) {
-            enabledEntries += 1;
-          }
-        }
-        if (enabledEntries >= spots) {
-          return reject(
-            `Event ${event_id} is full at max capacity at ${spots} spots`
-          );
-        }
-
-        query(addUserEventSql, [user_id, currentEpoch, event_id, paid, receipt])
-          .then((data) => resolve(data.rows[0]))
-          .catch((err) => reject(err));
+    eventIsOpenToEntries(event_id)
+      .then((spots) => {
+        eventHasSpace(event_id, spots)
+          .then(() => {
+            query(addUserEventSql, [
+              user_id,
+              currentEpoch,
+              event_id,
+              paid,
+              receipt,
+            ])
+              .then((data) => resolve(data.rows[0]))
+              .catch((err) => {
+                //check if err is unique violation, if so update to enabled instead
+                if (err.constraint === "user_events_user_id_event_id_key") {
+                  enableUserEvent(event_id, user_id)
+                    .then((data) => {
+                      resolve(data.rows[0]);
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                      reject("An unknown error occurred #4");
+                    });
+                } else {
+                  reject("An unknown error occurred #3");
+                }
+              });
+          })
+          .catch((spaceErr) => {
+            reject(spaceErr);
+          });
       })
-      .catch((err) => reject(err));
+      .catch((entryErr) => {
+        reject(entryErr);
+      });
   });
 };
 
