@@ -2,7 +2,7 @@ import { query } from "../query";
 
 const getShop = ({ category }) => {
   const sql = `
-      select * from shop where category = $1
+      select * from shop where category = $1 order by price DESC
       `;
   // console.logcategory;
   return new Promise((resolve, reject) => {
@@ -31,7 +31,7 @@ const addTransaction = ({ itemId, userId }) => {
   const sql = `
   insert into transactions
   ( item,
-    purchaser,
+    user_id,
     purchase_date)
     values ($1, $2, $3)
   `;
