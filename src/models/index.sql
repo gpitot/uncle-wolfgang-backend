@@ -27,7 +27,8 @@ CREATE TABLE user_events (
     event_id integer references events(id) not null,
     paid BOOLEAN not null default false,
     receipt varchar(100) default null,
-    enabled BOOLEAN not null DEFAULT true
+    enabled BOOLEAN not null DEFAULT true,
+    UNIQUE (user_id, event_id)
 );
 
 
