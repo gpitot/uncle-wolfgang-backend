@@ -1,4 +1,6 @@
 import { query } from "../query";
+import { addNotification } from "../notifications";
+import { userChallengedText } from "../notifications/texts";
 
 const getLadders = () => {
   const sql = "SELECT * FROM LADDERS;";
@@ -118,6 +120,7 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
         $3,
         $4
     )
+    returning id;
     `;
 
   //first check that this challenge has not already been made (and pending)
@@ -142,7 +145,16 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
         } else {
           query(sql, [ladder_id, player_1, player_2, currentEpoch])
             .then((data) => {
-              resolve(data.rows);
+              const match_id = data.rows[0].id;
+
+              // add notification to challenged user
+              addNotification({
+                user_id: player_2,
+                title: userChallengedText.title,
+                link: userChallengedText.link(player_2, match_id),
+              });
+
+              resolve();
             })
             .catch((err) => reject(err));
         }

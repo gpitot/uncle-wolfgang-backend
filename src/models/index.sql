@@ -91,3 +91,14 @@ CREATE TABLE TRANSACTIONS (
     purchase_date bigint not null,
     payment_status VARCHAR(20) default 'pending'
 );
+
+
+CREATE TABLE NOTIFICATIONS (
+    id SERIAL PRIMARY KEY,
+    user_id integer references users(id) not null,
+    acknowledged boolean default false,
+    title VARCHAR(50) not null,
+    description VARCHAR(200),
+    link VARCHAR(50) not null,
+    notification_date bigint not null
+)
