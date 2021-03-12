@@ -1,6 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { login, addUser } from "../../../queries/users";
+import { login, addUser, getUser } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
 import { authenticateUser } from "../../../middleware/auth";
 
@@ -15,6 +15,19 @@ router.get("/me", authenticateUser, async (req, res) => {
     success: true,
     user: req.user,
   });
+});
+
+router.get("/user/:id", authenticateUser, async (req, res) => {
+  getUser(req.params.id)
+    .then((data) => {
+      res.send({
+        success: true,
+        user: data,
+      });
+    })
+    .catch((err) => {
+      res.send({ success: false, err });
+    });
 });
 
 router.post(

@@ -2,6 +2,20 @@ import { query } from "../query";
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 
+const getUser = (id) => {
+  const sql = "SELECT id, firstname, lastname, photo from USERS where id = $1";
+  return new Promise((resolve, reject) => {
+    query(sql, [id])
+      .then((data) => {
+        if (data.rows.length === 0) return reject("No user exists");
+        return resolve(data.rows[0]);
+      })
+      .catch(() => {
+        reject("An unknown error occurred");
+      });
+  });
+};
+
 const login = (req) => {
   const sql = `
   SELECT 
@@ -94,4 +108,4 @@ const updateUser = ({ user }) => {
   });
 };
 
-export { addUser, updateUser, login };
+export { getUser, addUser, updateUser, login };
