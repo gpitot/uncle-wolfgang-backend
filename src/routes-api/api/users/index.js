@@ -65,7 +65,6 @@ router.post(
       next
     ),
   async (req, res) => {
-    console.log(SESSION_SECRET);
     addUser(req.body)
       .then((data) => {
         const accessToken = jwt.sign(data, SESSION_SECRET);

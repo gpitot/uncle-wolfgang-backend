@@ -24,7 +24,7 @@ const login = (req) => {
    where email = $1
   `;
   return new Promise((resolve, reject) => {
-    query(sql, [req.email])
+    query(sql, [req.email.toLowerCase()])
       .then((data) => {
         if (data.rows.length === 0) return reject("No user exists");
         const {
@@ -69,7 +69,7 @@ const addUser = ({
         return reject(err);
       }
 
-      query(sql, [email, hash, firstname, lastname, photo])
+      query(sql, [email.toLowerCase(), hash, firstname, lastname, photo])
         .then((data) => {
           const { id, email, firstname, lastname, photo, role } = data.rows[0];
           resolve({ id, email, firstname, lastname, photo, role });
