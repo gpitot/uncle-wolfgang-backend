@@ -37,7 +37,7 @@ app.use(
   cors({
     credentials: true,
     origin: [
-      "https://northmanlysquash.com/",
+      "https://northmanlysquash.com",
       "http://localhost:3001",
       "https://northmanlysquash-v2.netlify.app",
       "https://6030ad0f4b6bfa0007e7ed01--northmanlysquash-v2.netlify.app",
