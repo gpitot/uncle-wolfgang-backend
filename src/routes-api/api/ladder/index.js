@@ -10,6 +10,8 @@ import {
   approveResult,
   signUp,
   getUpcomingMatches,
+  getAwaitingResults,
+  getAwaitingApprovals,
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -166,8 +168,8 @@ router.put(
     ),
   authenticateUser,
   async (req, res) => {
-    const player_1 = req.user.id;
-    submitResult({ ...req.body, player_1 })
+    const userid = req.user.id;
+    submitResult({ ...req.body, userid })
       .then((result) => {
         res.send({
           success: true,
@@ -231,5 +233,40 @@ router.post(
       });
   }
 );
+
+router.get("/awaitresults", authenticateUser, async (req, res) => {
+  const userid = req.user.id;
+  getAwaitingResults({
+    userid,
+  })
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        success: false,
+      });
+    });
+});
+
+router.get("/awaitapprovals", authenticateAdmin, async (req, res) => {
+  getAwaitingApprovals()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        success: false,
+      });
+    });
+});
 
 export default router;

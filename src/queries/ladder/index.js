@@ -74,6 +74,7 @@ const getMatches = ({
   sql += `
     order by match_date DESC, challenge_date DESC;
     `;
+
   return new Promise((resolve, reject) => {
     query(sql, args)
       .then((data) => {
@@ -199,35 +200,30 @@ const setMatchTime = ({ match_id, time }) => {
   });
 };
 
-const submitResult = ({
-  match_id,
-  player_1,
-  player_1_games,
-  player_2_games,
-}) => {
-  const checkUserSql = "select player_1 from ladder_matches where id = $1;";
+const submitResult = ({ match_id, userid, player_1_games, player_2_games }) => {
+  const checkUserSql =
+    "select player_1, player_2 from ladder_matches where id = $1;";
 
   const sql = `
     UPDATE LADDER_MATCHES
     set
-    player_1_games = $3,
-    player_2_games = $4
+    player_1_games = $2,
+    player_2_games = $3
     where
-    id = $1
-    and player_1 = $2;
+    id = $1;
   `;
   return new Promise(async (resolve, reject) => {
     try {
       const data = await query(checkUserSql, [match_id]);
       const rows = data.rows;
-      if (rows[0].player_1 !== player_1) {
-        reject("Invalid player1 id");
+      if (rows[0].player_1 !== userid && rows[0].player_2 !== userid) {
+        reject("Invalid userid");
       }
     } catch (err) {
       reject(err);
     }
 
-    query(sql, [match_id, player_1, player_1_games, player_2_games])
+    query(sql, [match_id, player_1_games, player_2_games])
       .then((data) => {
         resolve(data.rows);
       })
@@ -242,17 +238,29 @@ const approveResult = ({ match_id }) => {
     approved = true
     where
     id = $1
-    returning ladder_id, player_1, player_2;
+    returning ladder_id, player_1, player_2, player_1_games;
   `;
   return new Promise(async (resolve, reject) => {
     try {
       const { rows } = await query(sql, [match_id]);
 
       try {
+        let winner;
+        let loser;
+        const { ladder_id, player_1, player_2, player_1_games } = rows[0];
+
+        if (player_1_games === 3) {
+          winner = player_1;
+          loser = player_2;
+        } else {
+          winner = player_2;
+          loser = player_1;
+        }
+
         await changeRank({
-          ladder_id: rows[0].ladder_id,
-          winner: rows[0].player_1,
-          loser: rows[0].player_2,
+          ladder_id: ladder_id,
+          winner,
+          loser,
         });
         resolve();
       } catch (err) {
@@ -306,8 +314,6 @@ const changeRank = ({ ladder_id, winner, loser }) => {
 
   let loserIndex = null;
   let winnerIndex = null;
-  let player;
-  let newRank;
   let sql = `
     UPDATE LADDER_RANKS
     set rank = $1
@@ -318,18 +324,17 @@ const changeRank = ({ ladder_id, winner, loser }) => {
 
   const moveWinnerAboveLoser = (rows) => {
     if (loserIndex > 0) {
-      newRank =
+      return (
         parseFloat(rows[loserIndex].rank) +
         (parseFloat(rows[loserIndex - 1].rank) -
           parseFloat(rows[loserIndex].rank)) /
-          2;
-    } else {
-      newRank =
-        parseFloat(rows[loserIndex].rank) +
-        (MAX_RANK - parseFloat(rows[loserIndex].rank)) / 2;
+          2
+      );
     }
-
-    player = winner;
+    return (
+      parseFloat(rows[loserIndex].rank) +
+      (MAX_RANK - parseFloat(rows[loserIndex].rank)) / 2
+    );
   };
 
   return new Promise(async (resolve, reject) => {
@@ -354,34 +359,17 @@ const changeRank = ({ ladder_id, winner, loser }) => {
         }
       }
 
-      if (loserIndex === null) {
-        // put in loser at bottom of table
-        newRank = rows[rows.length - 1].rank / 2;
-        player = loser;
+      if (winnerIndex < loserIndex) {
+        console.log("winner is already above loser");
+        // do nothing because winner is already before loser
+        return resolve();
       }
 
-      if (winnerIndex === null) {
-        // place winner above loser
-        moveWinnerAboveLoser(rows);
-        sql = `
-            INSERT INTO LADDER_RANKS
-            (ladder_id, user_id, rank)
-            values ($3, $2, $1);
-        `;
-      } else {
-        if (loserIndex === null) {
-          //do nothing this should not occur
-        } else {
-          if (loserIndex > winnerIndex) {
-            //place winner above loser
-            moveWinnerAboveLoser(rows);
-          }
-        }
-      }
+      const newRank = moveWinnerAboveLoser(rows);
 
       try {
-        console.log(newRank, player, sql);
-        await query(sql, [newRank, player, ladder_id]);
+        console.log("new rank : ", newRank, "winner id ", winner);
+        await query(sql, [newRank, winner, ladder_id]);
         resolve();
       } catch (err) {
         reject(err);
@@ -464,6 +452,88 @@ const getUpcomingMatches = () => {
   });
 };
 
+const getAwaitingResults = ({ userid }) => {
+  const sql = `
+  SELECT LADDER_MATCHES.id,
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
+  LADDER_MATCHES.match_date,
+  LADDER_MATCHES.player_2_games,
+  LADDER_MATCHES.player_1_games,
+  LADDER_MATCHES.player_1_paid,
+  LADDER_MATCHES.player_2_paid,
+  LADDER_MATCHES.approved,
+  LADDER_MATCHES.accepted,
+
+  player_1_users.firstname as player_1_firstname,
+  player_1_users.lastname as player_1_lastname, 
+  player_1_users.photo as player_1_photo,
+
+  player_2_users.firstname as player_2_firstname,
+  player_2_users.lastname as player_2_lastname, 
+  player_2_users.photo as player_2_photo
+   FROM LADDER_MATCHES 
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+   WHERE
+   (
+   player_1_users.id = $1
+   or
+   player_2_users.id = $1
+   )
+   AND
+   approved = false
+   AND
+   MATCH_DATE < $2
+   AND player_1_games is null;
+   `;
+  return new Promise((resolve, reject) => {
+    query(sql, [userid, Date.now()])
+      .then((data) => {
+        resolve(data.rows);
+      })
+      .catch((err) => reject(err));
+  });
+};
+
+const getAwaitingApprovals = () => {
+  const sql = `
+  SELECT LADDER_MATCHES.id,
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
+  LADDER_MATCHES.match_date,
+  LADDER_MATCHES.player_2_games,
+  LADDER_MATCHES.player_1_games,
+  LADDER_MATCHES.player_1_paid,
+  LADDER_MATCHES.player_2_paid,
+  LADDER_MATCHES.approved,
+  LADDER_MATCHES.accepted,
+
+  player_1_users.firstname as player_1_firstname,
+  player_1_users.lastname as player_1_lastname, 
+  player_1_users.photo as player_1_photo,
+
+  player_2_users.firstname as player_2_firstname,
+  player_2_users.lastname as player_2_lastname, 
+  player_2_users.photo as player_2_photo
+   FROM LADDER_MATCHES 
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+   WHERE
+   approved = false
+   AND
+   MATCH_DATE < $1
+   AND player_1_games is not null;
+   `;
+  return new Promise((resolve, reject) => {
+    query(sql, [Date.now()])
+      .then((data) => {
+        resolve(data.rows);
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 export {
   getLadders,
   getMatches,
@@ -475,4 +545,6 @@ export {
   approveResult,
   signUp,
   getUpcomingMatches,
+  getAwaitingResults,
+  getAwaitingApprovals,
 };
