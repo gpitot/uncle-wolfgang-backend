@@ -139,34 +139,43 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
 
   return new Promise((resolve, reject) => {
     if (player_1 === player_2) return reject("Cannot challenge yourself");
-    query(noChallengeYet, [ladder_id, player_1, player_2])
-      .then((data) => {
-        if (data.rows.length > 0) {
-          reject("You already have challenged this player");
-        } else {
-          query(sql, [ladder_id, player_1, player_2, currentEpoch])
-            .then((data) => {
-              const match_id = data.rows[0].id;
 
-              // add notification to challenged user
-              addNotification({
-                user_id: player_2,
-                title: userChallengedText.title,
-                description: userChallengedText.description,
-                action_positive_text: userChallengedText.action_positive_text,
-                action_positive_link: userChallengedText.action_positive_link(
-                  player_2,
-                  match_id
-                ),
-              });
-              console.log("this should resolve nicely");
-              resolve();
-            })
-            .catch((err) => {
-              console.log(err);
-              reject("Could not challenge player");
-            });
-        }
+    signUp({ ladder_id, player_id: player_1 })
+      .then(() => {
+        query(noChallengeYet, [ladder_id, player_1, player_2])
+          .then((data) => {
+            if (data.rows.length > 0) {
+              reject("You already have challenged this player");
+            } else {
+              query(sql, [ladder_id, player_1, player_2, currentEpoch])
+                .then((data) => {
+                  const match_id = data.rows[0].id;
+
+                  // add notification to challenged user
+                  addNotification({
+                    user_id: player_2,
+                    title: userChallengedText.title,
+                    description: userChallengedText.description,
+                    action_positive_text:
+                      userChallengedText.action_positive_text,
+                    action_positive_link: userChallengedText.action_positive_link(
+                      player_2,
+                      match_id
+                    ),
+                  });
+                  console.log("this should resolve nicely");
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log(err);
+                  reject("Could not challenge player");
+                });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            reject("Could not challenge player");
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -411,24 +420,46 @@ const getBottomRank = (ladder_id) => {
   });
 };
 
+const getUserExistsOnLadder = ({ ladder_id, player_id }) => {
+  const sql = `
+  SELECT * FROM LADDER_RANKS
+  where ladder_id = $1
+  and user_id = $2
+  `;
+  return new Promise((resolve, reject) => {
+    query(sql, [ladder_id, player_id])
+      .then((data) => {
+        resolve(data.length >= 1);
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 const signUp = ({ ladder_id, player_id }) => {
   const sql = `
     INSERT INTO LADDER_RANKS (ladder_id, user_id, rank) VALUES (
       $1, $2, $3
     );
   `;
-  console.log("signUp ", ladder_id, player_id);
   return new Promise((resolve, reject) => {
-    getBottomRank(ladder_id)
-      .then((bottomRank) => {
-        console.log(bottomRank);
-        const newBottomRank = bottomRank / 2;
+    getUserExistsOnLadder({ ladder_id, player_id })
+      .then((exists) => {
+        if (exists) {
+          //user already exists do not sign them up
+          return resolve();
+        } else {
+          getBottomRank(ladder_id)
+            .then((bottomRank) => {
+              const newBottomRank = bottomRank / 2;
 
-        query(sql, [ladder_id, player_id, newBottomRank])
-          .then(() => {
-            resolve();
-          })
-          .catch((err) => reject(err));
+              query(sql, [ladder_id, player_id, newBottomRank])
+                .then(() => {
+                  resolve();
+                })
+                .catch((err) => reject(err));
+            })
+            .catch((err) => reject(err));
+        }
       })
       .catch((err) => reject(err));
   });
