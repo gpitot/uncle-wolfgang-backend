@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 const saltRounds = 10;
 
 const getUser = (id) => {
-  const sql = "SELECT id, firstname, lastname, photo from USERS where id = $1";
+  const sql =
+    "SELECT id, firstname, lastname, photo from USERS where id = $1";
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -55,10 +56,11 @@ const addUser = ({
   firstname,
   lastname,
   photo = "default.jpg",
+  phone,
 }) => {
   const sql = `
-  INSERT INTO USERS (email, password, firstname, lastname, photo)
-  VALUES ($1, $2, $3, $4, $5)
+  INSERT INTO USERS (email, password, firstname, lastname, photo, phone)
+  VALUES ($1, $2, $3, $4, $5, $6)
   returning *;
   `;
 
@@ -69,7 +71,7 @@ const addUser = ({
         return reject(err);
       }
 
-      query(sql, [email.toLowerCase(), hash, firstname, lastname, photo])
+      query(sql, [email.toLowerCase(), hash, firstname, lastname, photo, phone])
         .then((data) => {
           const { id, email, firstname, lastname, photo, role } = data.rows[0];
           resolve({ id, email, firstname, lastname, photo, role });
@@ -88,9 +90,10 @@ const updateUser = ({ user }) => {
   firstname = $2,
   lastname = $3,
   photo = $4
-  where id = $5
+  phone = $5
+  where id = $6
   `;
-  const { id, password, firstname, lastname, photo } = user;
+  const { id, password, firstname, lastname, photo, phone } = user;
 
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, saltRounds, function (err, hash) {
@@ -99,7 +102,7 @@ const updateUser = ({ user }) => {
         return reject(err);
       }
 
-      query(sql, [hash, firstname, lastname, photo, id])
+      query(sql, [hash, firstname, lastname, photo, phone, id])
         .then(() => {
           resolve();
         })

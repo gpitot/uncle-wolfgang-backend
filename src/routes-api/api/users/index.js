@@ -59,7 +59,7 @@ router.post(
   "/create",
   (req, res, next) =>
     validateRequest(
-      ["email", "password", "firstname", "lastname"],
+      ["email", "password", "firstname", "lastname", "phone"],
       req.body,
       res,
       next
