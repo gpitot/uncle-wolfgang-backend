@@ -105,8 +105,10 @@ router.post(
           result,
         });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         res.send({
+          err,
           success: false,
         });
       });

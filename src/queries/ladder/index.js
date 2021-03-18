@@ -142,7 +142,7 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
     query(noChallengeYet, [ladder_id, player_1, player_2])
       .then((data) => {
         if (data.rows.length > 0) {
-          reject("Challenge already exists");
+          reject("You already have challenged this player");
         } else {
           query(sql, [ladder_id, player_1, player_2, currentEpoch])
             .then((data) => {
@@ -152,15 +152,26 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
               addNotification({
                 user_id: player_2,
                 title: userChallengedText.title,
-                link: userChallengedText.link(player_2, match_id),
+                description: userChallengedText.description,
+                action_positive_text: userChallengedText.action_positive_text,
+                action_positive_link: userChallengedText.action_positive_link(
+                  player_2,
+                  match_id
+                ),
               });
-
+              console.log("this should resolve nicely");
               resolve();
             })
-            .catch((err) => reject(err));
+            .catch((err) => {
+              console.log(err);
+              reject("Could not challenge player");
+            });
         }
       })
-      .catch((err) => reject(err));
+      .catch((err) => {
+        console.log(err);
+        reject("Could not challenge player");
+      });
   });
 };
 const acceptChallenge = ({ match_id, player_2 }) => {

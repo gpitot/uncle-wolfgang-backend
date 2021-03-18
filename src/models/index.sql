@@ -99,6 +99,9 @@ CREATE TABLE NOTIFICATIONS (
     acknowledged boolean default false,
     title VARCHAR(50) not null,
     description VARCHAR(200),
-    link VARCHAR(50) not null,
+    action_positive_text VARCHAR(50) default null,
+    action_positive_link VARCHAR(200) default null,
+    action_negative_text VARCHAR(50) default null,
+    action_negative_link VARCHAR(200) default null,
     notification_date bigint not null
 )

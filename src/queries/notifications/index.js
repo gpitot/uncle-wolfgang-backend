@@ -2,8 +2,16 @@ import { query } from "../query";
 
 const getNotifications = (user_id) => {
   const sql = `
-   select * from notifications
-   where acknowledged = true
+   select 
+    id,
+    title,
+    description,
+    action_positive_text,
+    action_positive_link,
+    action_negative_text,
+    action_negative_link
+   from notifications
+   where acknowledged = false
    and
    user_id = $1;
    `;
@@ -18,19 +26,40 @@ const getNotifications = (user_id) => {
   });
 };
 
-const addNotification = ({ user_id, title, description, link }) => {
-  const sql =
-    "insert into notifications (user_id, title, description, link, notification_date) values ($1, $2, $3, $4, $5);";
-  query(sql, [user_id, title, description, link, Date.now()])
+const addNotification = ({
+  user_id,
+  title,
+  description,
+  action_positive_text,
+  action_positive_link,
+  action_negative_text,
+  action_negative_link,
+}) => {
+  const sql = `
+  insert into notifications 
+  (user_id, title, description, action_positive_text, action_positive_link, action_negative_text, action_negative_link, notification_date)
+  values ($1, $2, $3, $4, $5, $6, $7, $8);`;
+  console.log("adding notification");
+  query(sql, [
+    user_id,
+    title,
+    description,
+    action_positive_text,
+    action_positive_link,
+    action_negative_text,
+    action_negative_link,
+    Date.now(),
+  ])
     .then(() => {
       console.log("added notification----------");
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       console.log("An unknown error occurred");
     });
 };
 
-const acknowledgeNotification = (id) => {
+const acknowledgeNotification = ({ id }) => {
   const sql = `
     update notifications
     set acknowledged = true
