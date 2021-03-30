@@ -470,7 +470,8 @@ const getUpcomingMatches = () => {
   SELECT LADDER_MATCHES.id,
   LADDER_MATCHES.match_date,
   
-
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
   player_1_users.firstname as player_1_firstname,
   player_1_users.lastname as player_1_lastname, 
   player_1_users.photo as player_1_photo,
