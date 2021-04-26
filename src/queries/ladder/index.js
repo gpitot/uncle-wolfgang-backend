@@ -429,7 +429,7 @@ const getUserExistsOnLadder = ({ ladder_id, player_id }) => {
   return new Promise((resolve, reject) => {
     query(sql, [ladder_id, player_id])
       .then((data) => {
-        resolve(data.length >= 1);
+        resolve(data.rows.length >= 1);
       })
       .catch((err) => reject(err));
   });
