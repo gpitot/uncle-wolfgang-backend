@@ -20,7 +20,7 @@ const getEvents = () => {
   //for some reason needs to add 11 hours because it takes 11 off the now ?
   const currentEpoch = Date.now();
   const sql = `SELECT * FROM events
-  where start >= $1 and open <= $1`;
+  where start >= $1 and open <= $1 ORDER BY START ASC`;
   return new Promise((resolve, reject) => {
     query(sql, [currentEpoch])
       .then((data) => {
