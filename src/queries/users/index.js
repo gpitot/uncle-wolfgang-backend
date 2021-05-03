@@ -1,10 +1,10 @@
 import { query } from "../query";
+import { addAdminNotification } from "../notifications";
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 
 const getUser = (id) => {
-  const sql =
-    "SELECT id, firstname, lastname, photo from USERS where id = $1";
+  const sql = "SELECT id, firstname, lastname, photo from USERS where id = $1";
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -74,6 +74,9 @@ const addUser = ({
       query(sql, [email.toLowerCase(), hash, firstname, lastname, photo, phone])
         .then((data) => {
           const { id, email, firstname, lastname, photo, role } = data.rows[0];
+          addAdminNotification(
+            `${firstname} ${lastname} has registered an account`
+          );
           resolve({ id, email, firstname, lastname, photo, role });
         })
         .catch((qerr) => reject(qerr));

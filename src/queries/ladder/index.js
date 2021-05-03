@@ -1,5 +1,5 @@
 import { query } from "../query";
-import { addNotification } from "../notifications";
+import { addAdminNotification, addNotification } from "../notifications";
 import { userChallengedText } from "../notifications/texts";
 
 const getLadders = () => {
@@ -163,6 +163,10 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
                       match_id
                     ),
                   });
+
+                  addAdminNotification(
+                    `${player_1} has challenged ${player_2} on ladder: ${ladder_id}`
+                  );
                   console.log("this should resolve nicely");
                   resolve();
                 })
