@@ -6,6 +6,7 @@ import {
   getUser,
   resetPassword,
   generateResetToken,
+  searchForUsers,
 } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
@@ -122,6 +123,33 @@ router.post(
           result: {
             token,
           },
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.get(
+  "/search",
+  (req, res, next) => validateRequest(["q"], req.query, res, next),
+  authenticateAdmin,
+  async (req, res) => {
+    if (req.query.q.length < 1) {
+      return res.send({
+        success: true,
+        result : []
+      });
+    }
+    searchForUsers(req.query)
+      .then((data) => {
+        res.send({
+          success: true,
+          result: data,
         });
       })
       .catch((err) => {

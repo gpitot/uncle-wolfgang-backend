@@ -5,6 +5,7 @@ CREATE TABLE users (
     firstname VARCHAR(30) NOT NULL,
     lastname VARCHAR(30) NOT NULL,
     photo VARCHAR(200),
+    phone VARCHAR(15),
     role VARCHAR(20) DEFAULT 'customer'
 );
 

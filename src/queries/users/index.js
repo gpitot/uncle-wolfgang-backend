@@ -131,4 +131,24 @@ const generateResetToken = ({ user_id }) => {
   });
 };
 
-export { getUser, addUser, resetPassword, generateResetToken, login };
+const searchForUsers = ({ q }) => {
+  return new Promise((resolve, reject) => {
+    query(
+      "select id, email, phone, firstname, lastname from users where firstname ILIKE $1 or lastname ILIKE $1 limit 5",
+      [`${q}%`]
+    )
+      .then((res) => {
+        resolve(res.rows);
+      })
+      .catch(reject);
+  });
+};
+
+export {
+  getUser,
+  addUser,
+  resetPassword,
+  generateResetToken,
+  login,
+  searchForUsers,
+};
