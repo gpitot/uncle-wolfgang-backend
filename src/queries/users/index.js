@@ -84,34 +84,51 @@ const addUser = ({
   });
 };
 
-const updateUser = ({ user }) => {
-  const sql = `
+const resetPassword = ({ password, token }) => {
+  //check token is valid
 
-  UPDATE USERS
-  set
-  password = $1,
-  firstname = $2,
-  lastname = $3,
-  photo = $4
-  phone = $5
-  where id = $6
-  `;
-  const { id, password, firstname, lastname, photo, phone } = user;
-
+  //reset password for user associated with token
   return new Promise((resolve, reject) => {
-    bcrypt.hash(password, saltRounds, function (err, hash) {
-      // Store hash in your password DB.
-      if (err) {
-        return reject(err);
-      }
+    query("select * from password_resets where token = $1", [token])
+      .then((data) => {
+        if (data.rows.length === 0) return reject("invalid token");
+        const { user_id, expiry } = data.rows[0];
+        const currentEpoch = Date.now();
+        if (currentEpoch > expiry) return reject("invalid token");
 
-      query(sql, [hash, firstname, lastname, photo, phone, id])
-        .then(() => {
-          resolve();
-        })
-        .catch((qerr) => reject(qerr));
-    });
+        bcrypt.hash(password, saltRounds, function (err, hash) {
+          if (err) {
+            return reject(err);
+          }
+          query("update users set password = $1 where id = $2", [hash, user_id])
+            .then(() => {
+              query("update password_resets set expiry = 0 where token = $1", [
+                token,
+              ]);
+              resolve();
+            })
+            .catch((qerr) => reject(qerr));
+        });
+      })
+      .catch((berr) => {
+        reject(berr);
+      });
   });
 };
 
-export { getUser, addUser, updateUser, login };
+const generateResetToken = ({ user_id }) => {
+  const expiry = Date.now() + 1000 * 60 * 48; // 2 days
+  const token = Math.floor(Math.random() * 100000000) + 10000000;
+  return new Promise((resolve, reject) => {
+    query(
+      "insert into password_resets (user_id, token, expiry) values ($1, $2, $3)",
+      [user_id, token, expiry]
+    )
+      .then(() => {
+        resolve(token);
+      })
+      .catch(reject);
+  });
+};
+
+export { getUser, addUser, resetPassword, generateResetToken, login };

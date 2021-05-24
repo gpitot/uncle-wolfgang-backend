@@ -1,8 +1,14 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { login, addUser, getUser } from "../../../queries/users";
+import {
+  login,
+  addUser,
+  getUser,
+  resetPassword,
+  generateResetToken,
+} from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
-import { authenticateUser } from "../../../middleware/auth";
+import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 
 // eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
@@ -74,6 +80,47 @@ router.post(
           user: {
             ...data,
             accessToken,
+          },
+        });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.post(
+  "/reset",
+  (req, res, next) =>
+    validateRequest(["token", "password"], req.body, res, next),
+  async (req, res) => {
+    resetPassword(req.body)
+      .then(() => {
+        res.json({
+          success: true,
+        });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.post(
+  "/generate-reset",
+  (req, res, next) => validateRequest(["user_id"], req.body, res, next),
+  authenticateAdmin,
+  async (req, res) => {
+    generateResetToken(req.body)
+      .then((token) => {
+        res.json({
+          success: true,
+          result: {
+            token,
           },
         });
       })

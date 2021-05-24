@@ -98,4 +98,26 @@ router.post(
   }
 );
 
+router.post(
+  "/manual-entry",
+  (req, res, next) => validateRequest(["event_id"], req.body, res, next),
+  authenticateAdmin,
+  async (req, res) => {
+    addUserEvent(req.body)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+          err,
+        });
+      });
+  }
+);
+
 export default router;

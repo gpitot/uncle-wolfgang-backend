@@ -10,6 +10,14 @@ CREATE TABLE users (
 
 
 
+CREATE TABLE password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id integer references users(id) not null,
+    token VARCHAR(100) UNIQUE NOT NULL,
+    expiry bigint NOT NULL
+)
+
+
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
