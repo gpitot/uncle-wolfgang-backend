@@ -72,7 +72,7 @@ const getMatches = ({
   }
 
   sql += `
-    order by match_date DESC, challenge_date DESC;
+    order by match_date ASC, challenge_date DESC;
     `;
 
   return new Promise((resolve, reject) => {
