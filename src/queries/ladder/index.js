@@ -338,7 +338,7 @@ const changeRank = ({ ladder_id, winner, loser }) => {
 
   let loserIndex = null;
   let winnerIndex = null;
-  let sql = `
+  const sql = `
     UPDATE LADDER_RANKS
     set rank = $1
     where
@@ -348,6 +348,9 @@ const changeRank = ({ ladder_id, winner, loser }) => {
 
   const moveWinnerAboveLoser = (rows) => {
     if (loserIndex > 0) {
+      /*
+      returns loser rank + (person above loser - loser rank / 2)
+      */
       return (
         parseFloat(rows[loserIndex].rank) +
         (parseFloat(rows[loserIndex - 1].rank) -

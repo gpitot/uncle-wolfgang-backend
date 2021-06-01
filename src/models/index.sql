@@ -7,6 +7,7 @@ CREATE TABLE users (
     photo VARCHAR(200),
     phone VARCHAR(15),
     role VARCHAR(20) DEFAULT 'customer'
+    streak integer default 0
 );
 
 

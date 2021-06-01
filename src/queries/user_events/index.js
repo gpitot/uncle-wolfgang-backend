@@ -10,7 +10,8 @@ const getUsers = ({ event_id }) => {
     users.id as user_id,
     users.firstname,
     users.lastname,
-    users.photo
+    users.photo,
+    users.streak
     
     FROM user_events left join users
     on user_events.user_id = users.id
@@ -65,6 +66,7 @@ const removeSelfUserEvent = ({ id, user }) => {
         }
         query(sql, [id])
           .then((data) => {
+            updateStreak(user.id);
             resolve(data.rows);
           })
           .catch((err) => reject(err));
@@ -160,12 +162,16 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
               paid,
               receipt,
             ])
-              .then((data) => resolve(data.rows[0]))
+              .then((data) => {
+                updateStreak(user_id);
+                return resolve(data.rows[0]);
+              })
               .catch((err) => {
                 //check if err is unique violation, if so update to enabled instead
                 if (err.constraint === "user_events_user_id_event_id_key") {
                   enableUserEvent(event_id, user_id)
                     .then((data) => {
+                      updateStreak(user_id);
                       resolve(data.rows[0]);
                     })
                     .catch((err) => {
@@ -187,4 +193,72 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
   });
 };
 
-export { getUsers, addUserEvent, updateUserEvent, removeSelfUserEvent };
+const getUsersPastEvents = (user_id) => {
+  const sql = `
+  select events.id, name, start from user_events inner join events
+    on user_events.event_id = events.id
+    where user_events.paid = true and user_events.enabled = true and user_events.user_id = $1
+    order by events.start desc;
+  `;
+
+  return new Promise((resolve, reject) => {
+    query(sql, [user_id])
+      .then((data) => {
+        resolve(data.rows);
+      })
+      .catch(reject);
+  });
+};
+
+const calculateStreak = async (user_id) => {
+  //run this whenever somone registers or unregisters for an event
+  let streak = 0;
+  try {
+    const events = await getUsersPastEvents(user_id);
+    let time = Date.now();
+    const weekInMill = 1000 * 60 * 60 * 24 * 7;
+
+    for (let i = 0; i < events.length; i += 1) {
+      const { start } = events[i];
+      if (time - weekInMill > start) {
+        return streak;
+      }
+      streak += 1;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+
+  return streak;
+};
+
+const updateStreak = async (user_id) => {
+  let streak;
+  try {
+    streak = await calculateStreak(user_id);
+  } catch (err) {
+    streak = null;
+  }
+
+  if (streak === null) {
+    console.log("error occurred updating streak");
+    return;
+  }
+
+  const sql = `
+    UPDATE users
+    set streak = $1
+    where id = $2;
+  `;
+
+  query(sql, [streak, user_id]);
+};
+
+export {
+  getUsers,
+  addUserEvent,
+  updateUserEvent,
+  removeSelfUserEvent,
+  getUsersPastEvents,
+};

@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 const saltRounds = 10;
 
 const getUser = (id) => {
-  const sql = "SELECT id, firstname, lastname, photo from USERS where id = $1";
+  const sql = "SELECT id, firstname, lastname, photo, streak from USERS where id = $1";
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -36,11 +36,12 @@ const login = (req) => {
           lastname,
           photo,
           role,
+          streak
         } = data.rows[0];
         bcrypt.compare(req.password, hashedPassword, function (err, result) {
           // result == true
           if (result) {
-            resolve({ id, email, firstname, lastname, photo, role });
+            resolve({ id, email, firstname, lastname, photo, role, streak });
           } else {
             reject("incorrect password");
           }

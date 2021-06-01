@@ -4,6 +4,7 @@ import {
   addUserEvent,
   updateUserEvent,
   removeSelfUserEvent,
+  getUsersPastEvents,
 } from "../../../queries/user_events";
 import { authenticateAdmin, authenticateUser } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -115,6 +116,27 @@ router.post(
         res.send({
           success: false,
           err,
+        });
+      });
+  }
+);
+
+router.get(
+  "/user-history/:user_id",
+  (req, res, next) => validateRequest(["user_id"], req.params, res, next),
+  authenticateUser,
+  async (req, res) => {
+    const userId = req.params.user_id;
+    getUsersPastEvents(userId)
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
         });
       });
   }
