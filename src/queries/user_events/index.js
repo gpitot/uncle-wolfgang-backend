@@ -28,7 +28,7 @@ const getUsers = ({ event_id }) => {
   });
 };
 
-const updateUserEvent = ({ id, event_id, paid, enabled }) => {
+const updateUserEvent = ({ id, event_id, paid, enabled, user_id }) => {
   const sql = `
   update user_events
   set 
@@ -42,6 +42,7 @@ const updateUserEvent = ({ id, event_id, paid, enabled }) => {
     query(sql, [event_id, paid, enabled, id])
       .then((data) => {
         resolve(data.rows);
+        updateStreak(user_id);
       })
       .catch((err) => reject(err));
   });
@@ -66,8 +67,8 @@ const removeSelfUserEvent = ({ id, user }) => {
         }
         query(sql, [id])
           .then((data) => {
-            updateStreak(user.id);
             resolve(data.rows);
+            updateStreak(user.id);
           })
           .catch((err) => reject(err));
       })
@@ -163,16 +164,17 @@ const addUserEvent = ({ user_id, event_id, paid = false, receipt = null }) => {
               receipt,
             ])
               .then((data) => {
+                resolve(data.rows[0]);
                 updateStreak(user_id);
-                return resolve(data.rows[0]);
+                return;
               })
               .catch((err) => {
                 //check if err is unique violation, if so update to enabled instead
                 if (err.constraint === "user_events_user_id_event_id_key") {
                   enableUserEvent(event_id, user_id)
                     .then((data) => {
-                      updateStreak(user_id);
                       resolve(data.rows[0]);
+                      updateStreak(user_id);
                     })
                     .catch((err) => {
                       console.log(err);
@@ -217,12 +219,15 @@ const calculateStreak = async (user_id) => {
     const events = await getUsersPastEvents(user_id);
     let time = Date.now();
     const weekInMill = 1000 * 60 * 60 * 24 * 7;
+    const buffer = 1000 * 60 * 60 * 12;
+    const streakTime = weekInMill + buffer;
 
     for (let i = 0; i < events.length; i += 1) {
       const { start } = events[i];
-      if (time - weekInMill > start) {
+      if (time - streakTime > start) {
         return streak;
       }
+      time = start;
       streak += 1;
     }
   } catch (err) {

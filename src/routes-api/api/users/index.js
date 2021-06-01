@@ -7,6 +7,7 @@ import {
   resetPassword,
   generateResetToken,
   searchForUsers,
+  getMyStreak,
 } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
@@ -22,6 +23,19 @@ router.get("/me", authenticateUser, async (req, res) => {
     success: true,
     user: req.user,
   });
+});
+
+router.get("/streak", authenticateUser, async (req, res) => {
+  getMyStreak(req.user.id)
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch(() => {
+      res.send({ success: false });
+    });
 });
 
 router.get("/user/:id", authenticateUser, async (req, res) => {
@@ -142,7 +156,7 @@ router.get(
     if (req.query.q.length < 1) {
       return res.send({
         success: true,
-        result : []
+        result: [],
       });
     }
     searchForUsers(req.query)

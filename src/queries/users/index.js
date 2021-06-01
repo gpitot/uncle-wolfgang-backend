@@ -4,7 +4,8 @@ import bcrypt from "bcrypt";
 const saltRounds = 10;
 
 const getUser = (id) => {
-  const sql = "SELECT id, firstname, lastname, photo, streak from USERS where id = $1";
+  const sql =
+    "SELECT id, firstname, lastname, photo, streak from USERS where id = $1";
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -36,7 +37,7 @@ const login = (req) => {
           lastname,
           photo,
           role,
-          streak
+          streak,
         } = data.rows[0];
         bcrypt.compare(req.password, hashedPassword, function (err, result) {
           // result == true
@@ -135,11 +136,21 @@ const generateResetToken = ({ user_id }) => {
 const searchForUsers = ({ q }) => {
   return new Promise((resolve, reject) => {
     query(
-      "select id, email, phone, firstname, lastname from users where firstname ILIKE $1 or lastname ILIKE $1 limit 5",
+      "select id, email, phone, firstname, lastname, streak from users where firstname ILIKE $1 or lastname ILIKE $1 limit 5",
       [`${q}%`]
     )
       .then((res) => {
         resolve(res.rows);
+      })
+      .catch(reject);
+  });
+};
+
+const getMyStreak = (userid) => {
+  return new Promise((resolve, reject) => {
+    query("select streak from users where id = $1", [userid])
+      .then((res) => {
+        resolve(res.rows[0]);
       })
       .catch(reject);
   });
@@ -152,4 +163,5 @@ export {
   generateResetToken,
   login,
   searchForUsers,
+  getMyStreak,
 };
