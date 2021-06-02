@@ -15,6 +15,7 @@ import {
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
+import { sendMessage } from "../../../twilio-api";
 
 const router = express.Router();
 
@@ -104,6 +105,7 @@ router.post(
           success: true,
           result,
         });
+        //send sms
       })
       .catch((err) => {
         console.log(err);

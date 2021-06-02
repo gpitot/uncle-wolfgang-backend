@@ -1,6 +1,5 @@
 import { query } from "../query";
-import { addAdminNotification, addNotification } from "../notifications";
-import { userChallengedText } from "../notifications/texts";
+import { addAdminNotification } from "../notifications";
 
 const getLadders = () => {
   const sql = "SELECT * FROM LADDERS;";
@@ -152,17 +151,6 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
                   const match_id = data.rows[0].id;
 
                   // add notification to challenged user
-                  addNotification({
-                    user_id: player_2,
-                    title: userChallengedText.title,
-                    description: userChallengedText.description,
-                    action_positive_text:
-                      userChallengedText.action_positive_text,
-                    action_positive_link: userChallengedText.action_positive_link(
-                      player_2,
-                      match_id
-                    ),
-                  });
 
                   addAdminNotification(
                     `${player_1} has challenged ${player_2} on ladder: ${ladder_id}`
