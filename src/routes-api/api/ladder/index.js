@@ -15,7 +15,6 @@ import {
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
-import { sendMessage } from "../../../twilio-api";
 
 const router = express.Router();
 
@@ -99,6 +98,7 @@ router.post(
       ...req.body,
       ...req.params,
       player_1,
+      player_1_name: req.user.firstname,
     })
       .then((result) => {
         res.send({
@@ -126,6 +126,7 @@ router.put(
     acceptChallenge({
       ...req.body,
       player_2,
+      player_2_name: req.user.firstname,
     })
       .then((result) => {
         res.send({

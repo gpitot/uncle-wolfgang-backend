@@ -1,5 +1,9 @@
 import { query } from "../query";
-import { addAdminNotification } from "../notifications";
+import {
+  addAdminNotification,
+  addLadderChallengeSubmittedNotification,
+  addLadderChallengeAcceptedNotification,
+} from "../notifications";
 
 const getLadders = () => {
   const sql = "SELECT * FROM LADDERS;";
@@ -105,7 +109,7 @@ const getRanks = ({ ladder_id }) => {
   });
 };
 
-const addChallenge = ({ ladder_id, player_1, player_2 }) => {
+const addChallenge = ({ ladder_id, player_1, player_2, player_1_name }) => {
   const currentEpoch = Date.now();
   const sql = `
     insert into ladder_matches (
@@ -151,6 +155,11 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
                   const match_id = data.rows[0].id;
 
                   // add notification to challenged user
+                  addLadderChallengeSubmittedNotification(
+                    player_1_name,
+                    player_2,
+                    match_id
+                  );
 
                   addAdminNotification(
                     `${player_1} has challenged ${player_2} on ladder: ${ladder_id}`
@@ -175,7 +184,7 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
       });
   });
 };
-const acceptChallenge = ({ match_id, player_2 }) => {
+const acceptChallenge = ({ match_id, player_2, player_2_name }) => {
   //accept match then we organise for them
   //do not set date yet
   const sql = `
@@ -188,7 +197,7 @@ const acceptChallenge = ({ match_id, player_2 }) => {
   return new Promise((resolve, reject) => {
     query(sql, [match_id, player_2])
       .then((data) => {
-        console.log(data);
+        addLadderChallengeAcceptedNotification(player_2_name, match_id);
         resolve(data.rowCount === 1);
       })
       .catch((err) => reject(err));
