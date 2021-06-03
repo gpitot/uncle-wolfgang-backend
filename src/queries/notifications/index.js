@@ -48,6 +48,57 @@ const addLadderChallengeAcceptedNotification = (challenged_name, match_id) => {
     });
 };
 
+const getRankExtension = (rank) => {
+  if (rank === 1) return "1st";
+  if (rank === 2) return "2nd";
+  if (rank === 3) return "3rd";
+  return `${rank}th`;
+};
+
+const addLadderResultApprovedNotification = async (
+  winner,
+  loser,
+  winner_rank,
+  loser_rank
+) => {
+  /*
+  only send sms to players who are involved and change rank
+  e.g. do not send sms if higher player wins
+  */
+  if (winner_rank < loser_rank) return;
+  //lower rank is better
+  //remember 0 index
+  const new_winner_rank = getRankExtension(loser_rank); //0 index
+  const new_loser_rank = getRankExtension(loser_rank + 1);
+
+  const getDetails = async (id) => {
+    const sql = `
+    select firstname, phone
+    from users
+    where id = $1
+  `;
+
+    const data = await query(sql, [id]);
+    const rows = await data.rows;
+    if (rows.length === 0) return {};
+    return rows[0];
+  };
+
+  const { firstname: winner_firstname, phone: winner_phone } = await getDetails(
+    winner
+  );
+  const { firstname: loser_firstname, phone: loser_phone } = await getDetails(
+    loser
+  );
+  if (winner_firstname === undefined || loser_firstname === undefined) return;
+
+  const winnerMessage = `Hey ${winner_firstname}!\nWell done on the win.\nYou're now ranked ${new_winner_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+  sendMessage(winnerMessage, `+61${winner_phone}`);
+
+  const loserMessage = `Hey ${loser_firstname}!\nBetter luck next time.\nYou've been bumped down to ${new_loser_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+  sendMessage(loserMessage, `+61${loser_phone}`);
+};
+
 const addAdminNotification = (message) => {
   try {
     const url =
@@ -63,4 +114,9 @@ const addAdminNotification = (message) => {
   }
 };
 
-export { addLadderChallengeSubmittedNotification, addAdminNotification, addLadderChallengeAcceptedNotification };
+export {
+  addLadderChallengeSubmittedNotification,
+  addAdminNotification,
+  addLadderChallengeAcceptedNotification,
+  addLadderResultApprovedNotification,
+};

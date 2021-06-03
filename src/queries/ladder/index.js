@@ -3,6 +3,7 @@ import {
   addAdminNotification,
   addLadderChallengeSubmittedNotification,
   addLadderChallengeAcceptedNotification,
+  addLadderResultApprovedNotification,
 } from "../notifications";
 
 const getLadders = () => {
@@ -394,6 +395,12 @@ const changeRank = ({ ladder_id, winner, loser }) => {
       try {
         console.log("new rank : ", newRank, "winner id ", winner);
         await query(sql, [newRank, winner, ladder_id]);
+        addLadderResultApprovedNotification(
+          winner,
+          loser,
+          winnerIndex,
+          loserIndex
+        );
         resolve();
       } catch (err) {
         reject(err);
