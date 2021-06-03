@@ -6,12 +6,10 @@ import { query } from "../query";
 //sms
 const addLadderChallengeSubmittedNotification = (
   challenger_name,
-  challenged,
-  match_id
+  challenged
 ) => {
   //get firstname of challenger
   //get name and phone of challenged
-  //get match id for url to accept the challenge
   const sql = `
   select firstname, phone from users where id = $1`;
   query(sql, [challenged])
@@ -19,7 +17,7 @@ const addLadderChallengeSubmittedNotification = (
       if (res.rows.length > 0) {
         const { firstname, phone } = res.rows[0];
 
-        const message = `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}?action=accept_challenge&match=${match_id}`;
+        const message = `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}`;
         sendMessage(message, `+61${phone}`);
       }
     })

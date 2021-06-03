@@ -152,14 +152,11 @@ const addChallenge = ({ ladder_id, player_1, player_2, player_1_name }) => {
               reject("You already have challenged this player");
             } else {
               query(sql, [ladder_id, player_1, player_2, currentEpoch])
-                .then((data) => {
-                  const match_id = data.rows[0].id;
-
+                .then(() => {
                   // add notification to challenged user
                   addLadderChallengeSubmittedNotification(
                     player_1_name,
-                    player_2,
-                    match_id
+                    player_2
                   );
 
                   addAdminNotification(
