@@ -30,7 +30,7 @@ const authenticateJWT = (req, res, next, admin = false) => {
 
       req.user = user;
       if (admin) {
-        if (user.role !== "admin" && user.role !== "superman") {
+        if (!isAdmin(user)) {
           return res.sendStatus(403);
         }
       }
@@ -41,4 +41,8 @@ const authenticateJWT = (req, res, next, admin = false) => {
   }
 };
 
-export { authenticateAdmin, authenticateUser };
+const isAdmin = (user) => {
+  return user.role === "admin" || user.role === "superman";
+};
+
+export { authenticateAdmin, authenticateUser, isAdmin };

@@ -10,7 +10,11 @@ import {
   getMyStreak,
 } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
-import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
+import {
+  authenticateUser,
+  authenticateAdmin,
+  isAdmin,
+} from "../../../middleware/auth";
 
 // eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
@@ -41,9 +45,14 @@ router.get("/streak", authenticateUser, async (req, res) => {
 router.get("/user/:id", authenticateUser, async (req, res) => {
   getUser(req.params.id)
     .then((data) => {
+      const user = data;
+      if (!isAdmin(req.user)) {
+        delete user.email;
+        delete user.phone;
+      }
       res.send({
         success: true,
-        user: data,
+        user,
       });
     })
     .catch((err) => {

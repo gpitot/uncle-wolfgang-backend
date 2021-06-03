@@ -5,7 +5,7 @@ const saltRounds = 10;
 
 const getUser = (id) => {
   const sql =
-    "SELECT id, firstname, lastname, photo, streak from USERS where id = $1";
+    "SELECT id, firstname, lastname, photo, streak, email, phone from USERS where id = $1";
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
