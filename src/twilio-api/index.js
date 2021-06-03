@@ -1,8 +1,9 @@
 // eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
+import twilio from "twilio";
+import { addAdminNotification } from "../queries/notifications";
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-import twilio from "twilio";
 const client = twilio(accountSid, authToken);
 
 const cleanNumber = (number) => {
@@ -15,7 +16,7 @@ const cleanNumber = (number) => {
 
 const sendMessage = (body, number) => {
   const cleanNum = cleanNumber(number);
-  console.log(body, cleanNum);
+  addAdminNotification(`${cleanNum} ${body}`);
   //"+610433813674"
   client.messages
     .create({ body, from: "ManlySquash", to: cleanNum })
