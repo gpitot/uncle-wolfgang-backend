@@ -4,7 +4,6 @@ import events from "./api/events";
 import userEvents from "./api/user_events";
 import users from "./api/users";
 import shop from "./api/shop";
-import notifications from "./api/notifications";
 
 import query from "./api/query";
 
@@ -15,7 +14,6 @@ router.use("/events", events);
 router.use("/user_events", userEvents);
 router.use("/users", users);
 router.use("/shop", shop);
-router.use("/notifications", notifications);
 
 router.use("/query", query);
 

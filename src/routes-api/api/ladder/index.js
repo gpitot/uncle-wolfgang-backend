@@ -98,12 +98,14 @@ router.post(
       ...req.body,
       ...req.params,
       player_1,
+      player_1_name: req.user.firstname,
     })
       .then((result) => {
         res.send({
           success: true,
           result,
         });
+        //send sms
       })
       .catch((err) => {
         console.log(err);
@@ -124,6 +126,7 @@ router.put(
     acceptChallenge({
       ...req.body,
       player_2,
+      player_2_name: req.user.firstname,
     })
       .then((result) => {
         res.send({

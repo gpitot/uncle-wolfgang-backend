@@ -1,6 +1,10 @@
 import { query } from "../query";
-import { addAdminNotification, addNotification } from "../notifications";
-import { userChallengedText } from "../notifications/texts";
+import {
+  addAdminNotification,
+  addLadderChallengeSubmittedNotification,
+  addLadderChallengeAcceptedNotification,
+  addLadderResultApprovedNotification,
+} from "../notifications";
 
 const getLadders = () => {
   const sql = "SELECT * FROM LADDERS;";
@@ -106,7 +110,7 @@ const getRanks = ({ ladder_id }) => {
   });
 };
 
-const addChallenge = ({ ladder_id, player_1, player_2 }) => {
+const addChallenge = ({ ladder_id, player_1, player_2, player_1_name }) => {
   const currentEpoch = Date.now();
   const sql = `
     insert into ladder_matches (
@@ -152,17 +156,11 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
                   const match_id = data.rows[0].id;
 
                   // add notification to challenged user
-                  addNotification({
-                    user_id: player_2,
-                    title: userChallengedText.title,
-                    description: userChallengedText.description,
-                    action_positive_text:
-                      userChallengedText.action_positive_text,
-                    action_positive_link: userChallengedText.action_positive_link(
-                      player_2,
-                      match_id
-                    ),
-                  });
+                  addLadderChallengeSubmittedNotification(
+                    player_1_name,
+                    player_2,
+                    match_id
+                  );
 
                   addAdminNotification(
                     `${player_1} has challenged ${player_2} on ladder: ${ladder_id}`
@@ -187,7 +185,7 @@ const addChallenge = ({ ladder_id, player_1, player_2 }) => {
       });
   });
 };
-const acceptChallenge = ({ match_id, player_2 }) => {
+const acceptChallenge = ({ match_id, player_2, player_2_name }) => {
   //accept match then we organise for them
   //do not set date yet
   const sql = `
@@ -200,7 +198,7 @@ const acceptChallenge = ({ match_id, player_2 }) => {
   return new Promise((resolve, reject) => {
     query(sql, [match_id, player_2])
       .then((data) => {
-        console.log(data);
+        addLadderChallengeAcceptedNotification(player_2_name, match_id);
         resolve(data.rowCount === 1);
       })
       .catch((err) => reject(err));
@@ -397,6 +395,12 @@ const changeRank = ({ ladder_id, winner, loser }) => {
       try {
         console.log("new rank : ", newRank, "winner id ", winner);
         await query(sql, [newRank, winner, ladder_id]);
+        addLadderResultApprovedNotification(
+          winner,
+          loser,
+          winnerIndex,
+          loserIndex
+        );
         resolve();
       } catch (err) {
         reject(err);
