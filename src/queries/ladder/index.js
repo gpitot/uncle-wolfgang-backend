@@ -610,6 +610,111 @@ const adminEditMatch = ({
   });
 };
 
+const adminGetPendingAcceptedMatches = () => {
+  const sql = `
+  SELECT LADDER_MATCHES.id,
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
+  LADDER_MATCHES.match_date,
+  LADDER_MATCHES.player_2_games,
+  LADDER_MATCHES.player_1_games,
+  LADDER_MATCHES.player_1_paid,
+  LADDER_MATCHES.player_2_paid,
+  LADDER_MATCHES.approved,
+  LADDER_MATCHES.accepted,
+
+  player_1_users.firstname as player_1_firstname,
+  player_1_users.lastname as player_1_lastname, 
+  player_1_users.photo as player_1_photo,
+
+  player_2_users.firstname as player_2_firstname,
+  player_2_users.lastname as player_2_lastname, 
+  player_2_users.photo as player_2_photo
+   FROM LADDER_MATCHES 
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+    where accepted = false;
+  `;
+  return new Promise((resolve, reject) => {
+    query(sql)
+      .then((data) => {
+        resolve(data.rows);
+      })
+      .catch(reject);
+  });
+};
+
+const adminGetPendingBookingMatches = () => {
+  const sql = `
+  SELECT LADDER_MATCHES.id,
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
+  LADDER_MATCHES.match_date,
+  LADDER_MATCHES.player_2_games,
+  LADDER_MATCHES.player_1_games,
+  LADDER_MATCHES.player_1_paid,
+  LADDER_MATCHES.player_2_paid,
+  LADDER_MATCHES.approved,
+  LADDER_MATCHES.accepted,
+
+  player_1_users.firstname as player_1_firstname,
+  player_1_users.lastname as player_1_lastname, 
+  player_1_users.photo as player_1_photo,
+
+  player_2_users.firstname as player_2_firstname,
+  player_2_users.lastname as player_2_lastname, 
+  player_2_users.photo as player_2_photo
+   FROM LADDER_MATCHES 
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+    where accepted = true
+    and match_date is null;
+  `;
+  return new Promise((resolve, reject) => {
+    query(sql)
+      .then((data) => {
+        resolve(data.rows);
+      })
+      .catch(reject);
+  });
+};
+
+const adminGetPendingResultsMatches = () => {
+  const sql = `
+  SELECT LADDER_MATCHES.id,
+  LADDER_MATCHES.player_1,
+  LADDER_MATCHES.player_2,
+  LADDER_MATCHES.match_date,
+  LADDER_MATCHES.player_2_games,
+  LADDER_MATCHES.player_1_games,
+  LADDER_MATCHES.player_1_paid,
+  LADDER_MATCHES.player_2_paid,
+  LADDER_MATCHES.approved,
+  LADDER_MATCHES.accepted,
+
+  player_1_users.firstname as player_1_firstname,
+  player_1_users.lastname as player_1_lastname, 
+  player_1_users.photo as player_1_photo,
+
+  player_2_users.firstname as player_2_firstname,
+  player_2_users.lastname as player_2_lastname, 
+  player_2_users.photo as player_2_photo
+   FROM LADDER_MATCHES 
+   inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
+   inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
+   WHERE
+    match_date < $1
+    and player_1_games is null
+  `;
+  return new Promise((resolve, reject) => {
+    query(sql, [Date.now()])
+      .then((data) => {
+        resolve(data.rows);
+      })
+      .catch(reject);
+  });
+};
+
 export {
   getLadders,
   getMatches,
@@ -624,4 +729,7 @@ export {
   getAwaitingResults,
   getAwaitingApprovals,
   adminEditMatch,
+  adminGetPendingAcceptedMatches,
+  adminGetPendingBookingMatches,
+  adminGetPendingResultsMatches,
 };

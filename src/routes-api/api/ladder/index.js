@@ -13,6 +13,9 @@ import {
   getAwaitingResults,
   getAwaitingApprovals,
   adminEditMatch,
+  adminGetPendingAcceptedMatches,
+  adminGetPendingBookingMatches,
+  adminGetPendingResultsMatches,
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -295,8 +298,57 @@ router.get(
   }
 );
 
-router.get("/awaitapprovals", authenticateAdmin, async (req, res) => {
+router.get("/admin/approvals", authenticateAdmin, async (req, res) => {
   getAwaitingApprovals()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        success: false,
+      });
+    });
+});
+
+router.get("/admin/pending-accepted", authenticateAdmin, async (req, res) => {
+  adminGetPendingAcceptedMatches()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        success: false,
+      });
+    });
+});
+
+
+router.get("/admin/pending-playing", authenticateAdmin, async (req, res) => {
+  adminGetPendingBookingMatches()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({
+        success: false,
+      });
+    });
+});
+
+router.get("/admin/pending-results", authenticateAdmin, async (req, res) => {
+  adminGetPendingResultsMatches()
     .then((result) => {
       res.send({
         success: true,

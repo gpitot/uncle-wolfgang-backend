@@ -11,7 +11,11 @@ const authenticateAdmin = (req, res, next) => {
   authenticateJWT(req, res, next, true);
 };
 
-const authenticateJWT = (req, res, next, admin = false) => {
+const authenticateSuperman = (req, res, next) => {
+  authenticateJWT(req, res, next, true, true);
+};
+
+const authenticateJWT = (req, res, next, admin = false, superman = false) => {
   const authHeader = req.headers.authorization;
   const userCheck = req.headers.usercheck;
 
@@ -29,11 +33,19 @@ const authenticateJWT = (req, res, next, admin = false) => {
       }
 
       req.user = user;
+
+      if (superman) {
+        if (!isSuperman(user)) {
+          return res.sendStatus(403);
+        }
+      }
+
       if (admin) {
         if (!isAdmin(user)) {
           return res.sendStatus(403);
         }
       }
+
       next();
     });
   } else {
@@ -45,4 +57,8 @@ const isAdmin = (user) => {
   return user.role === "admin" || user.role === "superman";
 };
 
-export { authenticateAdmin, authenticateUser, isAdmin };
+const isSuperman = (user) => {
+  return user.role === "superman";
+};
+
+export { authenticateSuperman, authenticateAdmin, authenticateUser, isAdmin };

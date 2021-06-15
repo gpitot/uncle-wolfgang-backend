@@ -2,6 +2,20 @@ import fetch from "node-fetch";
 import FormData from "form-data";
 import { sendMessage } from "../../twilio-api";
 import { query } from "../query";
+import REMINDERS from "./reminders";
+
+const getDetails = async (id) => {
+  const sql = `
+  select firstname, phone
+  from users
+  where id = $1
+`;
+
+  const data = await query(sql, [id]);
+  const rows = await data.rows;
+  if (rows.length === 0) return {};
+  return rows[0];
+};
 
 //sms
 const addLadderChallengeSubmittedNotification = (
@@ -18,7 +32,7 @@ const addLadderChallengeSubmittedNotification = (
         const { firstname, phone } = res.rows[0];
 
         const message = `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}`;
-        sendMessage(message, `+61${phone}`);
+        sendMessage(message, phone);
       }
     })
     .catch((err) => {
@@ -38,7 +52,7 @@ const addLadderChallengeAcceptedNotification = (challenged_name, match_id) => {
         const { firstname, phone } = res.rows[0];
 
         const message = `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted.\nContact Gil or Pete to set up a discounted ladder booking.`;
-        sendMessage(message, `+61${phone}`);
+        sendMessage(message, phone);
       }
     })
     .catch((err) => {
@@ -69,19 +83,6 @@ const addLadderResultApprovedNotification = async (
   const new_winner_rank = getRankExtension(loser_rank); //0 index
   const new_loser_rank = getRankExtension(loser_rank + 1);
 
-  const getDetails = async (id) => {
-    const sql = `
-    select firstname, phone
-    from users
-    where id = $1
-  `;
-
-    const data = await query(sql, [id]);
-    const rows = await data.rows;
-    if (rows.length === 0) return {};
-    return rows[0];
-  };
-
   const { firstname: winner_firstname, phone: winner_phone } = await getDetails(
     winner
   );
@@ -91,10 +92,62 @@ const addLadderResultApprovedNotification = async (
   if (winner_firstname === undefined || loser_firstname === undefined) return;
 
   const winnerMessage = `Hey ${winner_firstname}!\nWell done on the win.\nYou're now ranked ${new_winner_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
-  sendMessage(winnerMessage, `+61${winner_phone}`);
+  sendMessage(winnerMessage, winner_phone);
 
   const loserMessage = `Hey ${loser_firstname}!\nBetter luck next time.\nYou've been bumped down to ${new_loser_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
-  sendMessage(loserMessage, `+61${loser_phone}`);
+  sendMessage(loserMessage, loser_phone);
+};
+
+const reminderNotification = async ({ reminderType, player_1, player_2 }) => {
+  console.log(reminderType, player_1, player_2);
+  const { firstname: player_1_firstname, phone: player_1_phone } =
+    await getDetails(player_1);
+
+  const { firstname: player_2_firstname, phone: player_2_phone } =
+    await getDetails(player_2);
+
+  if (player_1_firstname === undefined || player_2_firstname === undefined)
+    return;
+
+  console.log(player_1_firstname, player_2_firstname);
+
+  if (reminderType === "pending-matches") {
+    // send reminder to opponent only
+    const message = REMINDERS[reminderType](
+      player_1_firstname,
+      player_2_firstname,
+      player_2
+    );
+
+    sendMessage(message, player_2_phone);
+    return;
+  }
+
+  if (reminderType === "pending-playing") {
+    // send reminder to opponent only
+    sendMessage(
+      REMINDERS[reminderType](player_2_firstname, player_1_firstname),
+      player_1_phone
+    );
+    sendMessage(
+      REMINDERS[reminderType](player_1_firstname, player_2_firstname),
+      player_2_phone
+    );
+    return;
+  }
+
+  if (reminderType === "pending-result") {
+    // send reminder to opponent only
+    sendMessage(
+      REMINDERS[reminderType](player_1_firstname, player_2_firstname, player_1),
+      player_1_phone
+    );
+    sendMessage(
+      REMINDERS[reminderType](player_2_firstname, player_1_firstname, player_2),
+      player_2_phone
+    );
+    return;
+  }
 };
 
 const addAdminNotification = (message) => {
@@ -117,4 +170,5 @@ export {
   addAdminNotification,
   addLadderChallengeAcceptedNotification,
   addLadderResultApprovedNotification,
+  reminderNotification,
 };
