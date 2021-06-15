@@ -12,6 +12,7 @@ import {
   getUpcomingMatches,
   getAwaitingResults,
   getAwaitingApprovals,
+  adminEditMatch,
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -207,6 +208,38 @@ router.put(
         res.send({
           success: true,
           result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.put(
+  "/challenge/edit",
+  (req, res, next) =>
+    validateRequest(
+      [
+        "match_id",
+        "match_date",
+        "player_1_games",
+        "player_2_games",
+        "accepted",
+      ],
+      req.body,
+      res,
+      next
+    ),
+  authenticateAdmin,
+  async (req, res) => {
+    adminEditMatch(req.body)
+      .then(() => {
+        res.send({
+          success: true,
         });
       })
       .catch((err) => {

@@ -585,6 +585,31 @@ const getAwaitingApprovals = () => {
   });
 };
 
+const adminEditMatch = ({
+  match_id,
+  match_date,
+  player_1_games,
+  player_2_games,
+  accepted,
+}) => {
+  const sql = `
+    UPDATE LADDER_MATCHES
+    SET
+    match_date = $1,
+    player_1_games = $2,
+    player_2_games = $3,
+    accepted = $4
+    WHERE id = $5
+  `;
+  return new Promise((resolve, reject) => {
+    query(sql, [match_date, player_1_games, player_2_games, accepted, match_id])
+      .then(() => {
+        resolve();
+      })
+      .catch(reject);
+  });
+};
+
 export {
   getLadders,
   getMatches,
@@ -598,4 +623,5 @@ export {
   getUpcomingMatches,
   getAwaitingResults,
   getAwaitingApprovals,
+  adminEditMatch,
 };
