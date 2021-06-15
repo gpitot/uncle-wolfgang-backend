@@ -272,24 +272,28 @@ router.post(
   }
 );
 
-router.get("/awaitresults", authenticateUser, async (req, res) => {
-  const userid = req.user.id;
-  getAwaitingResults({
-    userid,
-  })
-    .then((result) => {
-      res.send({
-        success: true,
-        result,
-      });
+router.get(
+  "/awaitresults/:userid",
+  (req, res, next) => validateRequest(["userid"], req.params, res, next),
+  authenticateUser,
+  async (req, res) => {
+    getAwaitingResults({
+      userid: req.params.userid,
     })
-    .catch((err) => {
-      console.log(err);
-      res.send({
-        success: false,
+      .then((result) => {
+        res.send({
+          success: true,
+          result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
       });
-    });
-});
+  }
+);
 
 router.get("/awaitapprovals", authenticateAdmin, async (req, res) => {
   getAwaitingApprovals()
