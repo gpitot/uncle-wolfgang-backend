@@ -103,15 +103,9 @@ CREATE TABLE TRANSACTIONS (
 );
 
 
-CREATE TABLE NOTIFICATIONS (
+CREATE TABLE NOTIFICATIONS_SENT (
     id SERIAL PRIMARY KEY,
     user_id integer references users(id) not null,
-    acknowledged boolean default false,
-    title VARCHAR(50) not null,
-    description VARCHAR(200),
-    action_positive_text VARCHAR(50) default null,
-    action_positive_link VARCHAR(200) default null,
-    action_negative_text VARCHAR(50) default null,
-    action_negative_link VARCHAR(200) default null,
+    message VARCHAR(150),
     notification_date bigint not null
 )

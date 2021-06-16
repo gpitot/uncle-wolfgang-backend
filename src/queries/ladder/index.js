@@ -1,6 +1,6 @@
 import { query } from "../query";
 import {
-  addAdminNotification,
+  addAdminSheetsNotification,
   addLadderChallengeSubmittedNotification,
   addLadderChallengeAcceptedNotification,
   addLadderResultApprovedNotification,
@@ -159,7 +159,7 @@ const addChallenge = ({ ladder_id, player_1, player_2, player_1_name }) => {
                     player_2
                   );
 
-                  addAdminNotification(
+                  addAdminSheetsNotification(
                     `${player_1} has challenged ${player_2} on ladder: ${ladder_id}`
                   );
                   console.log("this should resolve nicely");

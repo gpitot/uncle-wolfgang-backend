@@ -1,6 +1,12 @@
 import express from "express";
-import { reminderNotification } from "../../../queries/notifications";
-import { authenticateSuperman } from "../../../middleware/auth";
+import {
+  reminderNotification,
+  getSMSSentNotifications,
+} from "../../../queries/notifications";
+import {
+  authenticateAdmin,
+  authenticateSuperman,
+} from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
@@ -29,5 +35,20 @@ router.post(
       });
   }
 );
+
+router.get("/", authenticateAdmin, (req, res) => {
+  getSMSSentNotifications()
+    .then((result) => {
+      res.send({
+        success: true,
+        result,
+      });
+    })
+    .catch(() => {
+      res.send({
+        success: false,
+      });
+    });
+});
 
 export default router;

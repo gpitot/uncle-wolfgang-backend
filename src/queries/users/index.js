@@ -1,5 +1,5 @@
 import { query } from "../query";
-import { addAdminNotification } from "../notifications";
+import { addAdminSheetsNotification } from "../notifications";
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 
@@ -76,7 +76,7 @@ const addUser = ({
       query(sql, [email.toLowerCase(), hash, firstname, lastname, photo, phone])
         .then((data) => {
           const { id, email, firstname, lastname, photo, role } = data.rows[0];
-          addAdminNotification(
+          addAdminSheetsNotification(
             `${firstname} ${lastname} has registered an account`
           );
           resolve({ id, email, firstname, lastname, photo, role });
