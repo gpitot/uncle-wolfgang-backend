@@ -185,7 +185,8 @@ const getSMSSentNotifications = () => {
     FROM
     notifications_sent as n
     inner join users as u
-    on n.user_id = u.id;
+    on n.user_id = u.id
+    order by n.notification_date desc;
   `;
   return new Promise((resolve, reject) => {
     query(sql)
