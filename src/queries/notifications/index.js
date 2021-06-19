@@ -118,20 +118,20 @@ const reminderNotification = async ({ reminderType, player_1, player_2 }) => {
   if (reminderType === "pending-playing") {
     // send reminder to opponent only
     sendMessage(
-      REMINDERS[reminderType](player_2_firstname, player_1_firstname),
+      REMINDERS[reminderType](player_1_firstname, player_2_firstname),
       player_1_phone
     );
     sendMessage(
-      REMINDERS[reminderType](player_1_firstname, player_2_firstname),
+      REMINDERS[reminderType](player_2_firstname, player_1_firstname),
       player_2_phone
     );
     addSMSSentNotification(
       player_1,
-      REMINDERS[reminderType](player_2_firstname, player_1_firstname)
+      REMINDERS[reminderType](player_1_firstname, player_2_firstname)
     );
     addSMSSentNotification(
       player_2,
-      REMINDERS[reminderType](player_1_firstname, player_2_firstname)
+      REMINDERS[reminderType](player_2_firstname, player_1_firstname)
     );
     return;
   }
