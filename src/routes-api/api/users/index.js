@@ -8,6 +8,7 @@ import {
   generateResetToken,
   searchForUsers,
   getMyStreak,
+  getIdPhoneFromEmail,
 } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
 import {
@@ -147,6 +148,38 @@ router.post(
             token,
           },
         });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.post(
+  "/user-generate-reset",
+  (req, res, next) => validateRequest(["email"], req.body, res, next),
+  async (req, res) => {
+    getIdPhoneFromEmail(req.body)
+      .then(({ id, phone }) => {
+        if (!phone || !id) {
+          return res.send({
+            success: false,
+          });
+        }
+        console.log(id, phone);
+        generateResetToken({ user_id : id, phone }, true)
+          .then(() => {
+            res.json({
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            throw Error(err);
+          });
       })
       .catch((err) => {
         console.log(err);

@@ -1,5 +1,8 @@
 import { query } from "../query";
-import { addAdminSheetsNotification } from "../notifications";
+import {
+  addAdminSheetsNotification,
+  sendResetPasswordTokenToUser,
+} from "../notifications";
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 
@@ -118,7 +121,7 @@ const resetPassword = ({ password, token }) => {
   });
 };
 
-const generateResetToken = ({ user_id }) => {
+const generateResetToken = ({ user_id, phone }, sendToPhone = false) => {
   const expiry = Date.now() + 1000 * 60 * 48; // 2 days
   const token = Math.floor(Math.random() * 100000000) + 10000000;
   return new Promise((resolve, reject) => {
@@ -127,7 +130,12 @@ const generateResetToken = ({ user_id }) => {
       [user_id, token, expiry]
     )
       .then(() => {
-        resolve(token);
+        if (!sendToPhone) {
+          return resolve(token);
+        }
+
+        sendResetPasswordTokenToUser(phone, token, user_id);
+        resolve();
       })
       .catch(reject);
   });
@@ -156,6 +164,16 @@ const getMyStreak = (userid) => {
   });
 };
 
+const getIdPhoneFromEmail = ({ email }) => {
+  return new Promise((resolve, reject) => {
+    query("select id, phone from users where email = $1", [email])
+      .then((res) => {
+        resolve(res.rows[0]);
+      })
+      .catch(reject);
+  });
+};
+
 export {
   getUser,
   addUser,
@@ -164,4 +182,5 @@ export {
   login,
   searchForUsers,
   getMyStreak,
+  getIdPhoneFromEmail,
 };

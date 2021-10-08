@@ -175,7 +175,8 @@ const addAdminSheetsNotification = (message) => {
 };
 
 const addSMSSentNotification = (userid, message) => {
-  const sql = "INSERT INTO NOTIFICATIONS_SENT (user_id, message, notification_date) values ($1, $2, $3)";
+  const sql =
+    "INSERT INTO NOTIFICATIONS_SENT (user_id, message, notification_date) values ($1, $2, $3)";
   query(sql, [userid, message, Date.now()]);
 };
 
@@ -197,6 +198,13 @@ const getSMSSentNotifications = () => {
   });
 };
 
+//sms
+const sendResetPasswordTokenToUser = async (phone, token, user_id) => {
+  const message = `Click here to reset your password:\nhttps://northmanlysquash.com/reset-password?token=${token}`;
+  sendMessage(message, phone);
+  addSMSSentNotification(user_id, message);
+};
+
 export {
   addLadderChallengeSubmittedNotification,
   addAdminSheetsNotification,
@@ -204,4 +212,5 @@ export {
   addLadderResultApprovedNotification,
   reminderNotification,
   getSMSSentNotifications,
+  sendResetPasswordTokenToUser,
 };
