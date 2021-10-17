@@ -11,7 +11,8 @@ const getUsers = ({ event_id }) => {
     users.firstname,
     users.lastname,
     users.photo,
-    users.streak
+    users.streak,
+    users.vaccinated
     
     FROM user_events left join users
     on user_events.user_id = users.id

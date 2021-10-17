@@ -9,6 +9,7 @@ import {
   searchForUsers,
   getMyStreak,
   getIdPhoneFromEmail,
+  editUser
 } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
 import {
@@ -215,6 +216,23 @@ router.get(
         });
       });
   }
+);
+
+
+router.put("/",
+    (req, res, next) => validateRequest(["user"], req.body, res, next),
+    authenticateAdmin,
+    async (req, res) => {
+        editUser(req.body.user).then(() => {
+            res.send({
+                success: true,
+            });
+        }).catch(() => {
+            res.send({
+                success: false,
+            });
+        });
+    }
 );
 
 export default router;

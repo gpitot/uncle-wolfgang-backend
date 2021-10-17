@@ -8,7 +8,7 @@ const saltRounds = 10;
 
 const getUser = (id) => {
   const sql =
-    "SELECT id, firstname, lastname, photo, streak, email, phone from USERS where id = $1";
+    "SELECT id, firstname, lastname, photo, streak, email, phone, vaccinated from USERS where id = $1";
   return new Promise((resolve, reject) => {
     query(sql, [id])
       .then((data) => {
@@ -174,13 +174,34 @@ const getIdPhoneFromEmail = ({ email }) => {
   });
 };
 
+const editUser = ({id, email, phone, firstname, lastname, photo, vaccinated}) => {
+    const sql = `
+        update users
+        set email=$2,
+            phone=$3,
+            firstname=$4,
+            lastname=$5,
+            photo=$6,
+            vaccinated=$7
+        where id = $1
+    `;
+    return new Promise((resolve, reject) => {
+        query(sql, [id, email, phone, firstname, lastname, photo, vaccinated])
+            .then(() => {
+                resolve();
+            })
+            .catch(reject);
+    });
+};
+
 export {
-  getUser,
-  addUser,
-  resetPassword,
-  generateResetToken,
-  login,
-  searchForUsers,
-  getMyStreak,
-  getIdPhoneFromEmail,
+    getUser,
+    addUser,
+    resetPassword,
+    generateResetToken,
+    login,
+    searchForUsers,
+    getMyStreak,
+    getIdPhoneFromEmail,
+    editUser
 };

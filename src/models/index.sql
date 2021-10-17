@@ -8,6 +8,7 @@ CREATE TABLE users (
     phone VARCHAR(15),
     role VARCHAR(20) DEFAULT 'customer'
     streak integer default 0
+    vaccinated BOOLEAN not null DEFAULT FALSE
 );
 
 
