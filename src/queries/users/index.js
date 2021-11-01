@@ -4,6 +4,7 @@ import {
   sendResetPasswordTokenToUser,
 } from "../notifications";
 import bcrypt from "bcrypt";
+import { signUp } from "../ladder";
 const saltRounds = 10;
 
 const getUser = (id) => {
@@ -79,10 +80,12 @@ const addUser = ({
       query(sql, [email.toLowerCase(), hash, firstname, lastname, photo, phone])
         .then((data) => {
           const { id, email, firstname, lastname, photo, role } = data.rows[0];
-          addAdminSheetsNotification(
-            `${firstname} ${lastname} has registered an account`
-          );
+
           resolve({ id, email, firstname, lastname, photo, role });
+          addAdminSheetsNotification(
+              `${firstname} ${lastname} has registered an account`
+          );
+          signUp({ladder_id : 1, player_id : id});
         })
         .catch((qerr) => reject(qerr));
     });

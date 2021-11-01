@@ -76,7 +76,7 @@ const getMatches = ({
   }
 
   sql += `
-    order by match_date DESC, challenge_date DESC;
+    order by match_date DESC, challenge_date DESC LIMIT 10;
     `;
 
   return new Promise((resolve, reject) => {
