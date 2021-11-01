@@ -64,30 +64,29 @@ const addLadderResultApprovedNotification = async (
   winner_rank,
   loser_rank
 ) => {
-  /*
-  only send sms to players who are involved and change rank
-  e.g. do not send sms if higher player wins
-  */
-  if (winner_rank < loser_rank) return;
-  //lower rank is better
-  //remember 0 index
-  const new_winner_rank = getRankExtension(loser_rank); //0 index
-  const new_loser_rank = getRankExtension(loser_rank + 1);
-
   const { firstname: winner_firstname, phone: winner_phone } = await getDetails(
-    winner
+      winner
   );
   const { firstname: loser_firstname, phone: loser_phone } = await getDetails(
-    loser
+      loser
   );
   if (winner_firstname === undefined || loser_firstname === undefined) return;
 
-  const winnerMessage = `Hey ${winner_firstname}!\nWell done on the win.\nYou're now ranked ${new_winner_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+  let winnerMessage;
+  let loserMessage;
+  //if the higher rank #1 beat #2
+  if (winner_rank < loser_rank) {
+    winnerMessage = `Hey ${winner_firstname}!\nWell done on the win against ${loser_firstname}.\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+    loserMessage = `Hey ${loser_firstname}!\nBetter luck next time against ${winner_firstname}.\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+  } else {
+    const new_winner_rank = getRankExtension(loser_rank); //0 index
+    const new_loser_rank = getRankExtension(loser_rank + 1);
+    winnerMessage = `Hey ${winner_firstname}!\nWell done on the win against ${loser_firstname}.\nYou're now ranked ${new_winner_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+    loserMessage = `Hey ${loser_firstname}!\nBetter luck next time.\nYou've been bumped down to ${new_loser_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+  }
+
   sendMessage(winnerMessage, winner_phone);
-
-  const loserMessage = `Hey ${loser_firstname}!\nBetter luck next time.\nYou've been bumped down to ${new_loser_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
   sendMessage(loserMessage, loser_phone);
-
   addSMSSentNotification(winner, winnerMessage);
   addSMSSentNotification(loser, loserMessage);
 };

@@ -381,17 +381,17 @@ const changeRank = ({ ladder_id, winner, loser }) => {
         }
       }
 
-      if (winnerIndex < loserIndex) {
-        console.log("winner is already above loser");
-        // do nothing because winner is already before loser
-        return resolve();
-      }
 
-      const newRank = moveWinnerAboveLoser(rows);
+
+
 
       try {
-        console.log("new rank : ", newRank, "winner id ", winner);
-        await query(sql, [newRank, winner, ladder_id]);
+        if (winnerIndex > loserIndex) {
+          console.log("winner is below loser");
+          const newRank = moveWinnerAboveLoser(rows);
+          console.log("new rank : ", newRank, "winner id ", winner);
+          await query(sql, [newRank, winner, ladder_id]);
+        }
         addLadderResultApprovedNotification(
           winner,
           loser,
