@@ -6,7 +6,6 @@ const recalculateAllStreaks = async () => {
     "select id from users where streak = 2 or streak = 5 or streak = 8 or streak = 11";
   try {
     const res = await query(sql);
-    console.log(res.rows);
     const promises = [];
     res.rows.forEach(({ id }) => {
       promises.push(updateStreak(id));
@@ -22,27 +21,13 @@ const recalculateAllStreaks = async () => {
   }
 };
 
-const usersWithMostSocialSignups = async () => {
+const usersByNumSocialSignups = async ({ order = "DESC", limit = 100 }) => {
   const sql = `select
-                     count(user_id), user_id, users.firstname, users.lastname
-                 FROM user_events left join users
+                     count(user_id), users.id, users.firstname, users.lastname
+                 FROM users left join user_events
                                             on user_events.user_id = users.id
-                 group by user_events.user_id, users.firstname, users.lastname
-                 order by count desc`;
-  return new Promise((resolve, reject) => {
-    query(sql)
-      .then((data) => {
-        resolve(data.rows);
-      })
-      .catch(reject);
-  });
-};
-
-const usersWithNoSocialSignups = async () => {
-  const sql = `select id, firstname, lastname from users
-                 where id not in (
-                     select user_id as id from user_events
-                 )`;
+                 group by users.id, users.firstname, users.lastname
+                 order by count ${order} limit ${limit}`;
   return new Promise((resolve, reject) => {
     query(sql)
       .then((data) => {
@@ -78,36 +63,8 @@ const getUsersWithFreebieSession = async () => {
   });
 };
 
-// gets a list of people who could be potential signups
-// based on freebie streaks
-// and on recent signups
-const findPotentialSocialSignups = async () => {
-  const people = [];
-
-  try {
-    people.push(await getUsersWithFreebieSession());
-  } catch (e) {
-    return [];
-  }
-
-  try {
-    const recentlyCreated = await getRecentlyCreatedUsers();
-    recentlyCreated.forEach((recent) => {
-      if (!people.find((person) => person.id === recent.id)) {
-        people.push(recent);
-      }
-    });
-  } catch (e) {
-    return [];
-  }
-
-  return people;
-};
-
 export {
-  usersWithMostSocialSignups,
-  usersWithNoSocialSignups,
-  recalculateAllStreaks,
+  usersByNumSocialSignups,
   getRecentlyCreatedUsers,
-  findPotentialSocialSignups,
+  getUsersWithFreebieSession,
 };
