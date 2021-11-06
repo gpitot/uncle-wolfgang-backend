@@ -9,7 +9,7 @@ import {
   searchForUsers,
   getMyStreak,
   getIdPhoneFromEmail,
-  editUser
+  editUser,
 } from "../../../queries/users";
 import { validateRequest } from "../../../middleware/validation";
 import {
@@ -171,7 +171,7 @@ router.post(
           });
         }
         console.log(id, phone);
-        generateResetToken({ user_id : id, phone }, true)
+        generateResetToken({ user_id: id, phone }, true)
           .then(() => {
             res.json({
               success: true,
@@ -218,21 +218,23 @@ router.get(
   }
 );
 
-
-router.put("/",
-    (req, res, next) => validateRequest(["user"], req.body, res, next),
-    authenticateAdmin,
-    async (req, res) => {
-        editUser(req.body.user).then(() => {
-            res.send({
-                success: true,
-            });
-        }).catch(() => {
-            res.send({
-                success: false,
-            });
+router.put(
+  "/",
+  (req, res, next) => validateRequest(["user"], req.body, res, next),
+  authenticateAdmin,
+  async (req, res) => {
+    editUser(req.body.user)
+      .then(() => {
+        res.send({
+          success: true,
         });
-    }
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+        });
+      });
+  }
 );
 
 export default router;

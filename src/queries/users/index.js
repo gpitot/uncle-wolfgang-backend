@@ -83,9 +83,9 @@ const addUser = ({
 
           resolve({ id, email, firstname, lastname, photo, role });
           addAdminSheetsNotification(
-              `${firstname} ${lastname} has registered an account`
+            `${firstname} ${lastname} has registered an account`
           );
-          signUp({ladder_id : 1, player_id : id});
+          signUp({ ladder_id: 1, player_id: id });
         })
         .catch((qerr) => reject(qerr));
     });
@@ -177,8 +177,16 @@ const getIdPhoneFromEmail = ({ email }) => {
   });
 };
 
-const editUser = ({id, email, phone, firstname, lastname, photo, vaccinated}) => {
-    const sql = `
+const editUser = ({
+  id,
+  email,
+  phone,
+  firstname,
+  lastname,
+  photo,
+  vaccinated,
+}) => {
+  const sql = `
         update users
         set email=$2,
             phone=$3,
@@ -188,23 +196,23 @@ const editUser = ({id, email, phone, firstname, lastname, photo, vaccinated}) =>
             vaccinated=$7
         where id = $1
     `;
-    return new Promise((resolve, reject) => {
-        query(sql, [id, email, phone, firstname, lastname, photo, vaccinated])
-            .then(() => {
-                resolve();
-            })
-            .catch(reject);
-    });
+  return new Promise((resolve, reject) => {
+    query(sql, [id, email, phone, firstname, lastname, photo, vaccinated])
+      .then(() => {
+        resolve();
+      })
+      .catch(reject);
+  });
 };
 
 export {
-    getUser,
-    addUser,
-    resetPassword,
-    generateResetToken,
-    login,
-    searchForUsers,
-    getMyStreak,
-    getIdPhoneFromEmail,
-    editUser
+  getUser,
+  addUser,
+  resetPassword,
+  generateResetToken,
+  login,
+  searchForUsers,
+  getMyStreak,
+  getIdPhoneFromEmail,
+  editUser,
 };

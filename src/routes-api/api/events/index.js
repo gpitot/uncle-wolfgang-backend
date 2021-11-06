@@ -5,7 +5,7 @@ import {
   getEvents,
   editEvent,
 } from "../../../queries/events";
-import {  authenticateAdmin } from "../../../middleware/auth";
+import { authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();

@@ -5,7 +5,9 @@ import userEvents from "./api/user_events";
 import users from "./api/users";
 import shop from "./api/shop";
 import notifications from "./api/notifications";
+import admin from "./api/admin";
 import query from "./api/query";
+import { authenticateAdmin } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -15,6 +17,7 @@ router.use("/user_events", userEvents);
 router.use("/users", users);
 router.use("/shop", shop);
 router.use("/notifications", notifications);
-router.use("/query", query);
+router.use("/admin", admin);
+router.use("/query", authenticateAdmin, query);
 
 export default router;

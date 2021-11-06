@@ -65,10 +65,10 @@ const addLadderResultApprovedNotification = async (
   loser_rank
 ) => {
   const { firstname: winner_firstname, phone: winner_phone } = await getDetails(
-      winner
+    winner
   );
   const { firstname: loser_firstname, phone: loser_phone } = await getDetails(
-      loser
+    loser
   );
   if (winner_firstname === undefined || loser_firstname === undefined) return;
 
