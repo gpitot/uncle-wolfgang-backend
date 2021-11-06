@@ -25,9 +25,12 @@ const addLadderChallengeSubmittedNotification = async (
   //get firstname of challenger
   //get name and phone of challenged
   const { firstname, phone } = await getDetails(challenged);
-  const message = `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}`;
-  sendMessage(message, phone);
-  addSMSSentNotification(challenged, message);
+  const message = REMINDERS["challenge-submitted"](
+    firstname,
+    challenger_name,
+    challenged
+  );
+  sendMessage(message, phone, challenged);
 };
 
 const addLadderChallengeAcceptedNotification = (challenged_name, match_id) => {
@@ -41,9 +44,11 @@ const addLadderChallengeAcceptedNotification = (challenged_name, match_id) => {
       if (res.rows.length > 0) {
         const { id, firstname, phone } = res.rows[0];
 
-        const message = `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted.\nContact Gil or Pete to set up a discounted ladder booking.`;
-        sendMessage(message, phone);
-        addSMSSentNotification(id, message);
+        const message = REMINDERS["challenge-accepted"](
+          firstname,
+          challenged_name
+        );
+        sendMessage(message, phone, id);
       }
     })
     .catch((err) => {
@@ -76,19 +81,30 @@ const addLadderResultApprovedNotification = async (
   let loserMessage;
   //if the higher rank #1 beat #2
   if (winner_rank < loser_rank) {
-    winnerMessage = `Hey ${winner_firstname}!\nWell done on the win against ${loser_firstname}.\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
-    loserMessage = `Hey ${loser_firstname}!\nBetter luck next time against ${winner_firstname}.\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+    winnerMessage = REMINDERS["ladder-match-winner-not-changed"](
+      winner_firstname,
+      loser_firstname
+    );
+    loserMessage = REMINDERS["ladder-match-loser-not-changed"](
+      loser_firstname,
+      winner_firstname
+    );
   } else {
     const new_winner_rank = getRankExtension(loser_rank); //0 index
     const new_loser_rank = getRankExtension(loser_rank + 1);
-    winnerMessage = `Hey ${winner_firstname}!\nWell done on the win against ${loser_firstname}.\nYou're now ranked ${new_winner_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
-    loserMessage = `Hey ${loser_firstname}!\nBetter luck next time.\nYou've been bumped down to ${new_loser_rank}!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`;
+    winnerMessage = REMINDERS["ladder-match-winner-changed"](
+      winner_firstname,
+      loser_firstname,
+      new_winner_rank
+    );
+    loserMessage = REMINDERS["ladder-match-loser-changed"](
+      loser_firstname,
+      new_loser_rank
+    );
   }
 
-  sendMessage(winnerMessage, winner_phone);
-  sendMessage(loserMessage, loser_phone);
-  addSMSSentNotification(winner, winnerMessage);
-  addSMSSentNotification(loser, loserMessage);
+  sendMessage(winnerMessage, winner_phone, winner);
+  sendMessage(loserMessage, loser_phone, loser);
 };
 
 const reminderNotification = async ({ reminderType, player_1, player_2 }) => {
@@ -109,8 +125,7 @@ const reminderNotification = async ({ reminderType, player_1, player_2 }) => {
       player_2
     );
 
-    sendMessage(message, player_2_phone);
-    addSMSSentNotification(player_2, message);
+    sendMessage(message, player_2_phone, player_2);
     return;
   }
 
@@ -118,19 +133,13 @@ const reminderNotification = async ({ reminderType, player_1, player_2 }) => {
     // send reminder to opponent only
     sendMessage(
       REMINDERS[reminderType](player_1_firstname, player_2_firstname),
-      player_1_phone
+      player_1_phone,
+      player_1
     );
     sendMessage(
       REMINDERS[reminderType](player_2_firstname, player_1_firstname),
-      player_2_phone
-    );
-    addSMSSentNotification(
-      player_1,
-      REMINDERS[reminderType](player_1_firstname, player_2_firstname)
-    );
-    addSMSSentNotification(
-      player_2,
-      REMINDERS[reminderType](player_2_firstname, player_1_firstname)
+      player_2_phone,
+      player_2
     );
     return;
   }
@@ -139,20 +148,13 @@ const reminderNotification = async ({ reminderType, player_1, player_2 }) => {
     // send reminder to opponent only
     sendMessage(
       REMINDERS[reminderType](player_1_firstname, player_2_firstname, player_1),
-      player_1_phone
+      player_1_phone,
+      player_1
     );
     sendMessage(
       REMINDERS[reminderType](player_2_firstname, player_1_firstname, player_2),
-      player_2_phone
-    );
-
-    addSMSSentNotification(
-      player_1,
-      REMINDERS[reminderType](player_1_firstname, player_2_firstname, player_1)
-    );
-    addSMSSentNotification(
-      player_2,
-      REMINDERS[reminderType](player_2_firstname, player_1_firstname, player_2)
+      player_2_phone,
+      player_2
     );
     return;
   }
@@ -199,9 +201,8 @@ const getSMSSentNotifications = () => {
 
 //sms
 const sendResetPasswordTokenToUser = async (phone, token, user_id) => {
-  const message = `Click here to reset your password:\nhttps://northmanlysquash.com/reset-password?token=${token}`;
-  sendMessage(message, phone);
-  addSMSSentNotification(user_id, message);
+  const message = REMINDERS["password-reset"](token);
+  sendMessage(message, phone, user_id);
 };
 
 export {
@@ -212,4 +213,5 @@ export {
   reminderNotification,
   getSMSSentNotifications,
   sendResetPasswordTokenToUser,
+  addSMSSentNotification,
 };
