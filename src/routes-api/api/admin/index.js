@@ -4,6 +4,8 @@ import {
   usersByNumSocialSignups,
   getRecentlyCreatedUsers,
 } from "../../../queries/admin";
+import { sendGroupMessage } from "../../../queries/notifications";
+import { validateRequest } from "../../../middleware/validation";
 
 const router = express.Router();
 
@@ -36,8 +38,15 @@ router.get("/potential-socials", async (req, res) => {
   });
 });
 
-// router.post("/send-social-reminders", async (req, res) => {
-//
-// });
+router.post(
+  "/send-group-message",
+  (req, res, next) =>
+    validateRequest(["users", "messageKey"], req.body, res, next),
+  async (req, res) => {
+    const { users, messageKey } = req.body;
+    sendGroupMessage(users, messageKey);
+    res.send({ success: true });
+  }
+);
 
 export default router;

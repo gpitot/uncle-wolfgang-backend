@@ -37,9 +37,9 @@ export default {
 
   // social session messages
 
-  "social-freebie-reminder": (firstname) =>
+  "social-freebie-reminder": ({ firstname }) =>
     `Hey ${firstname}, Sign up to this weeks Monday Social night for FREE!\nhttps://northmanlysquash.com/social\nafter 3 social weeks in a row you get the 4th for free!`,
 
-  "social-recent-user": (firstname) =>
+  "social-recent-user": ({ firstname }) =>
     `Hey ${firstname}, Monday Social night signups are now open!\n Sign up at\nhttps://northmanlysquash.com/social`,
 };

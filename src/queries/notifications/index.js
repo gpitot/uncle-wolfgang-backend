@@ -6,10 +6,10 @@ import REMINDERS from "./reminders";
 
 const getDetails = async (id) => {
   const sql = `
-  select firstname, phone
-  from users
-  where id = $1
-`;
+        select firstname, phone
+        from users
+        where id = $1
+    `;
 
   const data = await query(sql, [id]);
   const rows = await data.rows;
@@ -35,10 +35,11 @@ const addLadderChallengeSubmittedNotification = async (
 
 const addLadderChallengeAcceptedNotification = (challenged_name, match_id) => {
   const sql = `
-  select users.id, users.firstname, users.phone
-  from ladder_matches inner join users 
-  on ladder_matches.player_1 = users.id 
-  where ladder_matches.id = $1`;
+        select users.id, users.firstname, users.phone
+        from ladder_matches
+                 inner join users
+                            on ladder_matches.player_1 = users.id
+        where ladder_matches.id = $1`;
   query(sql, [match_id])
     .then((res) => {
       if (res.rows.length > 0) {
@@ -183,13 +184,12 @@ const addSMSSentNotification = (userid, message) => {
 
 const getSMSSentNotifications = () => {
   const sql = `
-    SELECT n.user_id , n.message, n.notification_date, u.firstname, u.lastname
-    FROM
-    notifications_sent as n
-    inner join users as u
-    on n.user_id = u.id
-    order by n.notification_date desc;
-  `;
+        SELECT n.user_id, n.message, n.notification_date, u.firstname, u.lastname
+        FROM notifications_sent as n
+                 inner join users as u
+                            on n.user_id = u.id
+        order by n.notification_date desc;
+    `;
   return new Promise((resolve, reject) => {
     query(sql)
       .then((data) => {
@@ -205,6 +205,15 @@ const sendResetPasswordTokenToUser = async (phone, token, user_id) => {
   sendMessage(message, phone, user_id);
 };
 
+const sendGroupMessage = (users, messageKey) => {
+  users.forEach((user) => {
+    const message = REMINDERS[messageKey](...user);
+    if (message) {
+      sendMessage(message, user.phone, user.id);
+    }
+  });
+};
+
 export {
   addLadderChallengeSubmittedNotification,
   addAdminSheetsNotification,
@@ -214,4 +223,5 @@ export {
   getSMSSentNotifications,
   sendResetPasswordTokenToUser,
   addSMSSentNotification,
+  sendGroupMessage,
 };
