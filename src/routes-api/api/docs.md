@@ -1,25 +1,14 @@
-
-
-
 /events
 get all events
 
-
-post event, 
-
+post event,
 
 /user_events
 
-
 /ladder
-
-
-
 
 /shop
 
-
 /users
-
 
 /notifications

@@ -258,7 +258,7 @@ const updateStreak = async (user_id) => {
     where id = $2;
   `;
 
-  query(sql, [streak, user_id]);
+  return query(sql, [streak, user_id]);
 };
 
 export {
@@ -267,4 +267,5 @@ export {
   updateUserEvent,
   removeSelfUserEvent,
   getUsersPastEvents,
+  updateStreak,
 };

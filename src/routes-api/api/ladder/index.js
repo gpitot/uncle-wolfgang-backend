@@ -330,7 +330,6 @@ router.get("/admin/pending-accepted", authenticateAdmin, async (req, res) => {
     });
 });
 
-
 router.get("/admin/pending-playing", authenticateAdmin, async (req, res) => {
   adminGetPendingBookingMatches()
     .then((result) => {

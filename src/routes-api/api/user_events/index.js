@@ -34,7 +34,12 @@ router.get(
 router.put(
   "/",
   (req, res, next) =>
-    validateRequest(["id", "event_id", "paid", "enabled", "user_id"], req.body, res, next),
+    validateRequest(
+      ["id", "event_id", "paid", "enabled", "user_id"],
+      req.body,
+      res,
+      next
+    ),
   authenticateAdmin,
   async (req, res) => {
     updateUserEvent(req.body)

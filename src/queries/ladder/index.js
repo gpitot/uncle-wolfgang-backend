@@ -381,10 +381,6 @@ const changeRank = ({ ladder_id, winner, loser }) => {
         }
       }
 
-
-
-
-
       try {
         if (winnerIndex > loserIndex) {
           console.log("winner is below loser");

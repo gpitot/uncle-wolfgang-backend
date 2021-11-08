@@ -1,91 +1,32 @@
 import express from "express";
 import { query } from "../../../queries/query";
-
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  //+ 11 hours
-  // const q = `
-  // SELECT *, current_timestamp FROM events
-  // where start >= now() + '11 hour'::interval
-  // ;
-  //   `;
-
-  // const qq = `SELECT
-  //   events.spots, events.start, events.open, events.enabled, user_events.firstname
-  //    from events left join user_events on events.id = user_events.event_id
-  //    where events.id = 1 and events.start >= now() + '11 hour'::interval and events.open <= now() + '11 hour'::interval
-  //    and events.enabled = true
-  //    and user_events.enabled = true;`;
-
-  // const qu = `update events
-  //   set start = '2021-01-05 19:00:00',
-  //   open = '2021-01-05 10:14:00'
-  //   where id = 1;
-  //   `;
-
-  // const q2 = `select events.enabled as event_enabled, user_events.enabled as user_event_enabled from events
-  //   left join user_events on events.id = user_events.event_id where events.id = 1
-  //   and events.start >= now() + '11 hour'::interval and events.open <= now() + '11 hour'::interval
-  //   and events.enabled = true
-  //   ;
-  //   `;
-
-  /*
-
-   insert into ladder_ranks
- (player_id, ladder_id, rank)
- values ('101573359282867079048', 1, 8750)
- */
-  //   const t = `
-  //   insert into ladders (name, description) values ('North Manly Youth League', 'The best young players in the region.')
-  //     `;
-  //   //unique_player_ladder_ranks
-  //   const s = `ALTER TABLE ladder_ranks
-  //   DROP CONSTRAINT unique_player_ladder_ranks;
-  //   `;
-
-  //   let a = `
-  //     insert into events (name, description, spots, start, open) values
-  //     ('Monday coaching', 'Monday Coaching. $10 for an hour with world class coaches', 8, '2021-03-01 19:00:00', '2021-02-27 12:00:00'),
-  //     ('Monday session 1', 'Monday Social from 7 to 830pm. $17.50 available to all skill levels.', 9, '2021-03-01 19:00:00', '2021-02-27 12:00:00'),
-  //     ('Monday session 2', 'Monday Social from 830 to 10pm. $17.50 available to all skill levels.', 9, '2021-03-01 19:00:00', '2021-02-27 12:00:00')
-  //   `;
-
-  // let initialStart = new Date("2021-03-01 19:00:00");
-  // let initialOpen = new Date("2021-02-27 12:00:00");
-
-  // const format = (d) => {
-  //   return `${d.getFullYear()}-`
-  // }
-
-  // for (let i = 0; i < 50; i += 1) {
-  //   a += ` ('Monday session 1', 'Monday Social from 7 to 830pm. $17.50 available to all skill levels.', 9, '${initialStart}', '${initialOpen}' )`;
-  //   initialStart.setDate(initialStart.getDate() + 7);
-  //   initialOpen.setDate(initialOpen.getDate() + 7);
-  // }
-  // console.log(a);
-
   // const hr = 1000 * 60 * 60;
   // const d = hr * 24;
-  // const s = 1614585600000 - hr; //6pm
-  // const s1 = s + hr; //7pm
-  // const s2 = s1 + hr * 2.5; //830pm
-  // const o = s - d * 10;
-
-  // console.log(s, s1, s2, o);
-
-  // const b = `
-  // insert into events (name, description, spots, start, open) values
-  //     ('Monday coaching', 'Monday Coaching from 6pm. $10 for an hour with world class coaches', 8, ${s}, ${o}),
-  //     ('Monday session 1', 'Monday Social from 7 to 830pm. $17.50 available to all skill levels.', 9, ${s1}, ${o}),
-  //     ('Monday session 2', 'Monday Social from 830 to 10pm. $17.50 available to all skill levels.', 9, ${s2}, ${o})
-  // `;
-
-  const c = "select * from LADDER_MATCHES";
+  // const s1 = 1636354800000; //6pm
+  // const s2 = s1 + hr; //7pm
+  // const s3 = s2 + hr * 1.5; //830pm
+  // const o = s1 - (d * 5) - (hr * 12);
+  // const week = d * 7;
+  //
+  // let sql = `insert into events (name, description, spots, start, open) values`;
+  // const maximum = 100;
+  // for (let i=0; i<maximum; i+=1) {
+  //   const offset = week * i;
+  //   sql += `
+  //     ('Monday session 1', 'Monday Social from 6 to 7pm. $12.50 intended for beginner - intermediate.', 4, ${s1 + offset}, ${o + offset}),
+  //     ('Monday session 2', 'Monday Social from 7 to 830pm. $17.50 intended for beginner - intermediate.', 8, ${s2 + offset}, ${o + offset}),
+  //     ('Monday session 3', 'Monday Social from 830 to 10pm. $17.50 intended for intermediate - advanced.', 8, ${s3 + offset}, ${o + offset})
+  //   `;
+  //   if (i < maximum - 1) {
+  //     sql += ','
+  //   }
+  // }
 
   //2020-12-19T08:16:04.714Z"
-  query(c)
+  query("select id from users where streak = 2")
     .then((result) => {
       res.send({
         result: result.rows,

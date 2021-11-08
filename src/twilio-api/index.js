@@ -1,7 +1,10 @@
 // eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
 import twilio from "twilio";
-import { addAdminSheetsNotification } from "../queries/notifications";
+import {
+  addAdminSheetsNotification,
+  addSMSSentNotification,
+} from "../queries/notifications";
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
@@ -14,9 +17,12 @@ const cleanNumber = (number) => {
   return n;
 };
 
-const sendMessage = (body, number) => {
+const sendMessage = (body, number, id) => {
   const cleanNum = cleanNumber(number);
-  addAdminSheetsNotification(`${cleanNum} ${body}`);
+  addAdminSheetsNotification(
+    `$https://northmanlysquash.com/profile/${id} ${body}`
+  );
+  addSMSSentNotification(id, body);
   //"+610433813674"
   client.messages
     .create({ body, from: "ManlySquash", to: cleanNum })
