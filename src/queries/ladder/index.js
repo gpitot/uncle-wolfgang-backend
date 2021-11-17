@@ -195,7 +195,11 @@ const acceptChallenge = ({ match_id, player_2, player_2_name }) => {
   return new Promise((resolve, reject) => {
     query(sql, [match_id, player_2])
       .then((data) => {
-        addLadderChallengeAcceptedNotification(player_2_name, match_id);
+        addLadderChallengeAcceptedNotification(
+          player_2_name,
+          match_id,
+          player_2
+        );
         resolve(data.rowCount === 1);
       })
       .catch((err) => reject(err));

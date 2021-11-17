@@ -33,28 +33,36 @@ const addLadderChallengeSubmittedNotification = async (
   sendMessage(message, phone, challenged);
 };
 
-const addLadderChallengeAcceptedNotification = (challenged_name, match_id) => {
-  const sql = `
+const addLadderChallengeAcceptedNotification = async (
+  challenged_name,
+  match_id,
+  challenged_id
+) => {
+  const sqlGetChallengerName = `
         select users.id, users.firstname, users.phone
         from ladder_matches
                  inner join users
                             on ladder_matches.player_1 = users.id
         where ladder_matches.id = $1`;
-  query(sql, [match_id])
-    .then((res) => {
-      if (res.rows.length > 0) {
-        const { id, firstname, phone } = res.rows[0];
 
-        const message = REMINDERS["challenge-accepted"](
-          firstname,
-          challenged_name
-        );
-        sendMessage(message, phone, id);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  const sqlGetChallengedPhone = "select phone from users where id = $1";
+
+  try {
+    const res = await query(sqlGetChallengerName, [match_id]);
+    if (res.rows.length > 0) {
+      const { id, firstname, phone } = res.rows[0];
+
+      const challengedRes = await query(sqlGetChallengedPhone, [challenged_id]);
+      const message = REMINDERS["challenge-accepted"](
+        firstname,
+        challenged_name,
+        challengedRes.rows[0].phone
+      );
+      sendMessage(message, phone, id);
+    }
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 const getRankExtension = (rank) => {
