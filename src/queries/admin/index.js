@@ -3,7 +3,7 @@ import { updateStreak } from "../user_events";
 
 const recalculateAllStreaks = async () => {
   const sql =
-    "select id from users where streak = 3 or streak = 6 or streak = 9 or streak = 12";
+    "select id from users where streak = 3 or streak = 7 or streak = 11 or streak = 15";
   try {
     const res = await query(sql);
     const promises = [];
@@ -53,7 +53,7 @@ const getRecentlyCreatedUsers = async () => {
 const getUsersWithFreebieSession = async () => {
   await recalculateAllStreaks();
   const sql = `select id, firstname, lastname, phone from users 
-    where streak = 3 or streak = 6 or streak = 9 or streak = 12`;
+    where streak = 3 or streak = 7 or streak = 11 or streak = 15`;
   return new Promise((resolve, reject) => {
     query(sql)
       .then((data) => {
