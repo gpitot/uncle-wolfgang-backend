@@ -3,8 +3,8 @@ export default {
   "pending-matches": (challenger, opponent, opponent_id) =>
     `Hey ${opponent},\nYou have a pending challenge from ${challenger}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${opponent_id}`,
 
-  "pending-playing": (player_1, player_2) =>
-    `Hey ${player_1},\nLet Gil or Pete know when you want to play your ladder match against ${player_2}`,
+  "pending-playing": (player_1, player_2, player_2_phone) =>
+    `Hey ${player_1},\nYou have a pending ladder match against ${player_2}.\nContact them on ${player_2_phone} to organise a time to play.`,
 
   "pending-result": (player_1, player_2, user_id) =>
     `Hey ${player_1},\nHow did you go against ${player_2}.\nPut your result in here:\nhttps://northmanlysquash.com/profile/${user_id}`,
@@ -13,7 +13,7 @@ export default {
     `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}`,
 
   "challenge-accepted": (firstname, challenged_name, challenged_phone) =>
-    `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted.\nContact ${challenged_name} on ${challenged_phone}.`,
+    `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted.\nContact ${challenged_name} on ${challenged_phone} to organise a time to play.`,
 
   "ladder-match-winner-not-changed": (winner_firstname, loser_firstname) =>
     `Hey ${winner_firstname}!\nWell done on the win against ${loser_firstname}.\nChallenge someone else at\nhttps://northmanlysquash.com/competition`,
