@@ -1,7 +1,7 @@
 export default {
   // ladder match messages
   "pending-matches": (challenger, opponent, opponent_id) =>
-    `Hey ${opponent},\nYou have a pending challenge from ${challenger}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${opponent_id}`,
+    `Hey ${opponent},\nYou have a pending challenge from ${challenger}.\nAccept or decline it here:\nhttps://northmanlysquash.com/profile/${opponent_id}`,
 
   "pending-playing": (player_1, player_2, player_2_phone) =>
     `Hey ${player_1},\nYou have a pending ladder match against ${player_2}.\nContact them on ${player_2_phone} to organise a time to play.`,
@@ -10,7 +10,7 @@ export default {
     `Hey ${player_1},\nHow did you go against ${player_2}.\nPut your result in here:\nhttps://northmanlysquash.com/profile/${user_id}`,
 
   "challenge-submitted": (firstname, challenger_name, challenged) =>
-    `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}`,
+    `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept or decline it here:\nhttps://northmanlysquash.com/profile/${challenged}`,
 
   "challenge-accepted": (firstname, challenged_name, challenged_phone) =>
     `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted!\nContact ${challenged_name} on ${challenged_phone} to organise a time to play.`,
