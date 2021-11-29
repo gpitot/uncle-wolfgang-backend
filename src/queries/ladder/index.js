@@ -2,7 +2,7 @@ import { query } from "../query";
 import {
   addAdminSheetsNotification,
   addLadderChallengeSubmittedNotification,
-  addLadderChallengeAcceptedNotification,
+  addLadderChallengeResponseNotification,
   addLadderResultApprovedNotification,
 } from "../notifications";
 
@@ -49,7 +49,7 @@ const getMatches = ({
    inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
    inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
    WHERE
-
+    LADDER_MATCHES.declined = false and
    `;
 
   const onlyChallenges =
@@ -195,10 +195,36 @@ const acceptChallenge = ({ match_id, player_2, player_2_name }) => {
   return new Promise((resolve, reject) => {
     query(sql, [match_id, player_2])
       .then((data) => {
-        addLadderChallengeAcceptedNotification(
+        addLadderChallengeResponseNotification(
           player_2_name,
           match_id,
-          player_2
+          player_2,
+          true
+        );
+        resolve(data.rowCount === 1);
+      })
+      .catch((err) => reject(err));
+  });
+};
+
+const declineChallenge = ({ match_id, player_2, player_2_name }) => {
+  //accept match then we organise for them
+  //do not set date yet
+  const sql = `
+    UPDATE LADDER_MATCHES
+    set
+    declined = true
+    where
+    id = $1 and player_2 = $2;
+  `;
+  return new Promise((resolve, reject) => {
+    query(sql, [match_id, player_2])
+      .then((data) => {
+        addLadderChallengeResponseNotification(
+          player_2_name,
+          match_id,
+          player_2,
+          false
         );
         resolve(data.rowCount === 1);
       })
@@ -633,7 +659,7 @@ const adminGetPendingAcceptedMatches = () => {
    FROM LADDER_MATCHES 
    inner join USERS as player_1_users on LADDER_MATCHES.player_1 = player_1_users.id
    inner join USERS as player_2_users on  LADDER_MATCHES.player_2 = player_2_users.id
-    where accepted = false;
+    where accepted = false and declined = false;
   `;
   return new Promise((resolve, reject) => {
     query(sql)
@@ -721,6 +747,7 @@ export {
   getRanks,
   addChallenge,
   acceptChallenge,
+  declineChallenge,
   setMatchTime,
   submitResult,
   approveResult,

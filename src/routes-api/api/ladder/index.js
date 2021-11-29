@@ -16,6 +16,7 @@ import {
   adminGetPendingAcceptedMatches,
   adminGetPendingBookingMatches,
   adminGetPendingResultsMatches,
+  declineChallenge,
 } from "../../../queries/ladder";
 import { authenticateUser, authenticateAdmin } from "../../../middleware/auth";
 import { validateRequest } from "../../../middleware/validation";
@@ -128,6 +129,30 @@ router.put(
   async (req, res) => {
     const player_2 = req.user.id;
     acceptChallenge({
+      ...req.body,
+      player_2,
+      player_2_name: req.user.firstname,
+    })
+      .then((result) => {
+        res.send({
+          success: result,
+        });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+        });
+      });
+  }
+);
+
+router.put(
+  "/challenge/decline",
+  (req, res, next) => validateRequest(["match_id"], req.body, res, next),
+  authenticateUser,
+  async (req, res) => {
+    const player_2 = req.user.id;
+    declineChallenge({
       ...req.body,
       player_2,
       player_2_name: req.user.firstname,

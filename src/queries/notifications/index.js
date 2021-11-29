@@ -33,10 +33,11 @@ const addLadderChallengeSubmittedNotification = async (
   sendMessage(message, phone, challenged);
 };
 
-const addLadderChallengeAcceptedNotification = async (
+const addLadderChallengeResponseNotification = async (
   challenged_name,
   match_id,
-  challenged_id
+  challenged_id,
+  accepted = true
 ) => {
   const sqlGetChallengerName = `
         select users.id, users.firstname, users.phone
@@ -53,7 +54,10 @@ const addLadderChallengeAcceptedNotification = async (
       const { id, firstname, phone } = res.rows[0];
 
       const challengedRes = await query(sqlGetChallengedPhone, [challenged_id]);
-      const message = REMINDERS["challenge-accepted"](
+      const reminderKey = accepted
+        ? "challenge-accepted"
+        : "challenge-declined";
+      const message = REMINDERS[reminderKey](
         firstname,
         challenged_name,
         challengedRes.rows[0].phone
@@ -233,7 +237,7 @@ const sendGroupMessage = (users, messageKey) => {
 export {
   addLadderChallengeSubmittedNotification,
   addAdminSheetsNotification,
-  addLadderChallengeAcceptedNotification,
+  addLadderChallengeResponseNotification,
   addLadderResultApprovedNotification,
   reminderNotification,
   getSMSSentNotifications,

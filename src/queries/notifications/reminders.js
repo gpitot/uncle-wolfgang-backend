@@ -13,7 +13,10 @@ export default {
     `Hey ${firstname}!\nYou have been challenged to a ladder match by ${challenger_name}.\nAccept it here:\nhttps://northmanlysquash.com/profile/${challenged}`,
 
   "challenge-accepted": (firstname, challenged_name, challenged_phone) =>
-    `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted.\nContact ${challenged_name} on ${challenged_phone} to organise a time to play.`,
+    `Hey ${firstname}!\nYour challenge to ${challenged_name} has been accepted!\nContact ${challenged_name} on ${challenged_phone} to organise a time to play.`,
+
+  "challenge-declined": (firstname, challenged_name) =>
+    `Hey ${firstname}!\nYour challenge to ${challenged_name} has been declined!\nChallenge someone else at\nhttps://northmanlysquash.com/competition`,
 
   "ladder-match-winner-not-changed": (winner_firstname, loser_firstname) =>
     `Hey ${winner_firstname}!\nWell done on the win against ${loser_firstname}.\nChallenge someone else at\nhttps://northmanlysquash.com/competition`,
