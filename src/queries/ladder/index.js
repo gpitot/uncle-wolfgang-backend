@@ -21,6 +21,8 @@ const getMatches = ({
   ladder_id = undefined,
   player_id = undefined,
   challenges = false,
+  limit = 10,
+  offset = 0,
 }) => {
   //with playerid gets challenges for that player
   const currentEpoch = Date.now();
@@ -75,8 +77,15 @@ const getMatches = ({
     sql += ` and ladder_id = $${args.length}`;
   }
 
+  args.push(limit);
+  args.push(offset);
+
+  const matchOrder = challenges === "true" ? "ASC" : "DESC";
+
   sql += `
-    order by match_date DESC, challenge_date DESC LIMIT 10;
+    order by match_date ${matchOrder}, accepted DESC, challenge_date DESC LIMIT $${
+    args.length - 1
+  } offset $${args.length};
     `;
 
   return new Promise((resolve, reject) => {
