@@ -352,27 +352,27 @@ const changeRank = ({ ladder_id, winner, loser }) => {
     order by rank DESC;
     `;
 
-  /*  
+  /*
 
     check that loser is in ranks table already
-    if no : 
+    if no :
         add to bottom rank e..g halfway between 0 and current bottom
-    if yes : 
-    
+    if yes :
+
 
     check that winner is in ranks table already
     if no :
-        if loser exists: 
+        if loser exists:
             place above between player above loser and loser
         if loser doesnt exist either
             CASE DOESNT EXIST (SOMEONE MUST CHALLENGE PLAYER ON RANK TABLE)
 
 
-    if yes : 
+    if yes :
         if loser does not exist:
             stay in same rank
 
-        if loser does exist : 
+        if loser does exist :
             if above then
                  move winner to above them
 
@@ -808,7 +808,7 @@ const updateUserRank = async (ladder_id, user, rank) => {
  */
 const demoteForInactivity = async ({ ladder_id }) => {
   const MAX_INACTIVE_TIME = 1000 * 60 * 60 * 24 * 30; // 30 days
-  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 7; // 14 days
+  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 7; // 7 days
   const CURRENT_TIME = Date.now();
   try {
     const users = await getUsersWhoPlayedSinceDate(
@@ -817,32 +817,52 @@ const demoteForInactivity = async ({ ladder_id }) => {
     );
     const ranks = await getPrivateRanks({ ladder_id });
 
-    let lastRank = null;
-    let lastUser = null;
-    let lastFirstname = null;
+    let lastUserAvailableForDemotion = null;
+    let actuallyDemoted = false;
+
+    const promises = [];
 
     for (let i = 0; i < ranks.length; i += 1) {
-      const { id, rank, firstname, last_demoted, phone } = ranks[i];
+      const { id, rank, last_demoted } = ranks[i];
 
       if (
-        users.has(id) &&
-        lastUser !== null &&
+        !users.has(id) &&
         last_demoted < CURRENT_TIME - MIN_TIME_BETWEEN_DEMOTIONS
       ) {
-        await updateUserRank(ladder_id, id, lastRank);
-        await updateUserRank(ladder_id, lastUser, rank);
-        //send notifications
-        sendDemotionMessage(lastUser, lastFirstname, i, phone);
-      } else {
-        lastUser = id;
-        lastFirstname = firstname;
+        // a new eligible user for demotion appears = send a text if there was a previous demotion
+        if (lastUserAvailableForDemotion && actuallyDemoted) {
+          promises.push(
+            sendDemotionMessage(
+              lastUserAvailableForDemotion.id,
+              lastUserAvailableForDemotion.firstname,
+              i,
+              lastUserAvailableForDemotion.phone
+            )
+          );
+        }
+
+        actuallyDemoted = false;
+        lastUserAvailableForDemotion = ranks[i];
+        continue;
       }
-      lastRank = rank;
+
+      if (lastUserAvailableForDemotion === null) {
+        // first user cannot go higher rank, user cannot swap up if the user above does not quality for demotion
+        continue;
+      }
+
+      // if we reach here then the user is eligible for promotion
+      // because users contains this id
+      // and because lastUserAvailableForDemotion is not null
+      await updateUserRank(ladder_id, id, lastUserAvailableForDemotion.rank);
+      await updateUserRank(ladder_id, lastUserAvailableForDemotion.id, rank);
+
+      actuallyDemoted = true;
     }
 
-    //send notification to myself
+    return Promise.all(promises);
   } catch (e) {
-    console.log("wtf ", e);
+    return Promise.reject();
   }
 };
 

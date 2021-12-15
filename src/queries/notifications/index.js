@@ -243,7 +243,7 @@ const sendDemotionMessage = (user_id, firstname, rank, phone) => {
     firstname,
     new_rank: getRankExtension(rank),
   });
-  sendMessage(message, phone, user_id);
+  return sendMessage(message, phone, user_id);
 };
 
 const sendWelcomeMessage = (user_id, firstname, phone) => {
