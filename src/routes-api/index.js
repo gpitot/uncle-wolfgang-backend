@@ -18,6 +18,6 @@ router.use("/users", users);
 router.use("/shop", shop);
 router.use("/notifications", notifications);
 router.use("/admin", authenticateAdmin, admin);
-router.use("/query", authenticateAdmin, query);
+router.use("/query", query);
 
 export default router;

@@ -45,4 +45,10 @@ export default {
 
   "social-recent-user": ({ firstname }) =>
     `Hey ${firstname}, Monday Social night signups are now open!\n Sign up at\nhttps://northmanlysquash.com/social`,
+
+  "welcome-new-user": ({ firstname }) =>
+    `Welcome to North Manly Squash club ${firstname}!\nSign up to the ladder league here https://northmanlysquash.com/competition\nSign up to social events here https://northmanlysquash.com/social`,
+
+  "ladder-user-demoted": ({ firstname, new_rank }) =>
+    `Hey ${firstname} due to inactivity on the ladder league you have been demoted to ${new_rank}.\nChallenge someone at\nhttps://northmanlysquash.com/competition`,
 };

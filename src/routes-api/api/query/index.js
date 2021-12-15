@@ -25,8 +25,17 @@ router.get("/", async (req, res) => {
   //   }
   // }
 
+  const q = `
+    select * from shop;
+    `;
+
+  //114
+  //113
+  //105
+
+  //select * from ladder_matches where player_1 = 16 and player_2 = 22 and approved = false
   //2020-12-19T08:16:04.714Z"
-  query("select id from users where streak = 2")
+  query(q)
     .then((result) => {
       res.send({
         result: result.rows,

@@ -2,9 +2,9 @@ import { query } from "../query";
 import {
   addAdminSheetsNotification,
   sendResetPasswordTokenToUser,
+  sendWelcomeMessage,
 } from "../notifications";
 import bcrypt from "bcrypt";
-import { signUp } from "../ladder";
 const saltRounds = 10;
 
 const getUser = (id) => {
@@ -85,7 +85,7 @@ const addUser = ({
           addAdminSheetsNotification(
             `${firstname} ${lastname} has registered an account`
           );
-          signUp({ ladder_id: 1, player_id: id });
+          sendWelcomeMessage(id, firstname, phone);
         })
         .catch((qerr) => reject(qerr));
     });

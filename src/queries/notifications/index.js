@@ -234,6 +234,19 @@ const sendGroupMessage = (users, messageKey) => {
   });
 };
 
+const sendDemotionMessage = (user_id, firstname, rank, phone) => {
+  const message = REMINDERS["ladder-user-demoted"]({
+    firstname,
+    new_rank: getRankExtension(rank),
+  });
+  sendMessage(message, phone, user_id);
+};
+
+const sendWelcomeMessage = (user_id, firstname, phone) => {
+  const message = REMINDERS["welcome-new-user"]({ firstname });
+  sendMessage(message, phone, user_id);
+};
+
 export {
   addLadderChallengeSubmittedNotification,
   addAdminSheetsNotification,
@@ -244,4 +257,6 @@ export {
   sendResetPasswordTokenToUser,
   addSMSSentNotification,
   sendGroupMessage,
+  sendDemotionMessage,
+  sendWelcomeMessage,
 };

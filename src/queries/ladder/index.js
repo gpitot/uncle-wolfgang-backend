@@ -4,6 +4,7 @@ import {
   addLadderChallengeSubmittedNotification,
   addLadderChallengeResponseNotification,
   addLadderResultApprovedNotification,
+  sendDemotionMessage,
 } from "../notifications";
 
 const getLadders = () => {
@@ -97,26 +98,38 @@ const getMatches = ({
   });
 };
 
-const getRanks = ({ ladder_id }) => {
+const getPrivateRanks = async ({ ladder_id }) => {
   const sql = `select 
     ladder_ranks.recent_change,
     users.id,
     users.firstname,
     users.lastname,
-    users.photo
+    users.photo,
+    users.phone,
+    ladder_ranks.rank,
+    ladder_ranks.last_demoted
     from ladder_ranks 
     inner join users on ladder_ranks.user_id = users.id
     where ladder_id = $1
     order by rank DESC;
     `;
+  try {
+    const { rows } = await query(sql, [ladder_id]);
+    return rows;
+  } catch (e) {
+    console.log(e);
+    return Promise.reject(e);
+  }
+};
 
-  return new Promise((resolve, reject) => {
-    query(sql, [ladder_id])
-      .then((data) => {
-        resolve(data.rows);
-      })
-      .catch((err) => reject(err));
-  });
+const getRanks = async ({ ladder_id }) => {
+  const data = await getPrivateRanks({ ladder_id });
+  return data.map((row) => ({
+    ...row,
+    phone: undefined,
+    rank: undefined,
+    last_demoted: undefined,
+  }));
 };
 
 const addChallenge = ({ ladder_id, player_1, player_2, player_1_name }) => {
@@ -750,6 +763,89 @@ const adminGetPendingResultsMatches = () => {
   });
 };
 
+const getUsersWhoPlayedSinceDate = async (date, ladder_id) => {
+  const sql = `
+    select player_1, player_2 from LADDER_MATCHES
+    where match_date > $1 and match_date <$2 and ladder_id = $3`;
+  try {
+    const { rows } = await query(sql, [date, Date.now(), ladder_id]);
+    const userSet = new Set();
+
+    rows.forEach(({ player_1, player_2 }) => {
+      userSet.add(player_1);
+      userSet.add(player_2);
+    });
+    return userSet;
+  } catch (e) {
+    console.log("ERROR ----", e);
+    return [];
+  }
+};
+
+const updateUserRank = async (ladder_id, user, rank) => {
+  const sql = `
+    UPDATE ladder_ranks
+    SET 
+        rank = $1,
+        last_demoted = $2
+    WHERE 
+          ladder_id = $3 and
+          user_id = $4
+  `;
+
+  await query(sql, [rank, Date.now(), ladder_id, user]);
+};
+
+/*
+  get all matches played in the last week
+  get all users from these matches
+  get all ranks for these users
+  go through in descending order (e.g. 1st rank first)
+  swap user with above
+  e.g. 9th becomes 8th, 8th becomes 9th
+  then
+  10th becomes 9th, 9th becomes 10th
+ */
+const demoteForInactivity = async ({ ladder_id }) => {
+  const MAX_INACTIVE_TIME = 1000 * 60 * 60 * 24 * 30; // 30 days
+  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 7; // 14 days
+  const CURRENT_TIME = Date.now();
+  try {
+    const users = await getUsersWhoPlayedSinceDate(
+      CURRENT_TIME - MAX_INACTIVE_TIME,
+      ladder_id
+    );
+    const ranks = await getPrivateRanks({ ladder_id });
+
+    let lastRank = null;
+    let lastUser = null;
+    let lastFirstname = null;
+
+    for (let i = 0; i < ranks.length; i += 1) {
+      const { id, rank, firstname, last_demoted, phone } = ranks[i];
+
+      if (
+        users.has(id) &&
+        lastUser !== null &&
+        last_demoted < CURRENT_TIME - MIN_TIME_BETWEEN_DEMOTIONS
+      ) {
+        await updateUserRank(ladder_id, id, lastRank);
+        await updateUserRank(ladder_id, lastUser, rank);
+        //send notifications
+        sendDemotionMessage(lastUser, lastFirstname, i, phone);
+      } else {
+        lastUser = id;
+        lastFirstname = firstname;
+      }
+      lastRank = rank;
+    }
+
+    //send notification to myself
+  } catch (e) {
+    console.log("wtf ", e);
+  }
+};
+
 export {
   getLadders,
   getMatches,
@@ -768,4 +864,5 @@ export {
   adminGetPendingAcceptedMatches,
   adminGetPendingBookingMatches,
   adminGetPendingResultsMatches,
+  demoteForInactivity,
 };
