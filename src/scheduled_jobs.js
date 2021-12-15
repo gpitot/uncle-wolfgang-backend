@@ -1,5 +1,11 @@
 #! /app/.heroku/node/bin/node
 
-import { sendMessage } from "./twilio-api";
+import { sendFreebieMessages } from "./scheduled/freebies";
 
-sendMessage("scheduled job 1", "0433641873", 1);
+const jobs = async () => {
+  await sendFreebieMessages();
+
+  process.exit();
+};
+
+jobs();

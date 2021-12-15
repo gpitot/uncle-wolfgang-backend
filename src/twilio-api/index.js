@@ -5,6 +5,7 @@ import {
   addAdminSheetsNotification,
   addSMSSentNotification,
 } from "../queries/notifications";
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
@@ -22,12 +23,13 @@ const sendMessage = (body, number, id) => {
   addAdminSheetsNotification(
     `$https://northmanlysquash.com/profile/${id} ${body}`
   );
-  addSMSSentNotification(id, body);
+  addSMSSentNotification(id, body.slice(0, 150));
   //"+610433813674"
-  client.messages
+  return client.messages
     .create({ body, from: "ManlySquash", to: cleanNum })
     .then((message) => console.log(message.sid))
-    .catch(console.log);
+    .catch(console.log)
+    .finally(() => Promise.resolve());
 };
 
 export { sendMessage };

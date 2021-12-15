@@ -225,13 +225,17 @@ const sendResetPasswordTokenToUser = async (phone, token, user_id) => {
   sendMessage(message, phone, user_id);
 };
 
-const sendGroupMessage = (users, messageKey) => {
+const sendGroupMessage = async (users, messageKey) => {
+  const promises = [];
   users.forEach((user) => {
-    const message = REMINDERS[messageKey](...user);
+    console.log(user);
+    const message = REMINDERS[messageKey](user);
     if (message) {
-      sendMessage(message, user.phone, user.id);
+      promises.push(sendMessage(message, user.phone, user.id));
     }
   });
+
+  return Promise.all(promises);
 };
 
 const sendDemotionMessage = (user_id, firstname, rank, phone) => {
