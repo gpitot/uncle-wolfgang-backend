@@ -4,7 +4,7 @@ export default {
     `Hey ${opponent},\nYou have a pending challenge from ${challenger}.\nAccept or decline it here:\nhttps://northmanlysquash.com/profile/${opponent_id}`,
 
   "pending-playing": (player_1, player_2, player_2_phone) =>
-    `Hey ${player_1},\nYou have a pending ladder match against ${player_2}.\nContact them on ${player_2_phone} to organise a time to play.`,
+    `Hey ${player_1},\nYou have a pending ladder match against ${player_2}.\nContact them on ${player_2_phone} to organise a time to play.\nOnce organised message Gil on 0433641873 to book in the match!`,
 
   "pending-result": (player_1, player_2, user_id) =>
     `Hey ${player_1},\nHow did you go against ${player_2}.\nPut your result in here:\nhttps://northmanlysquash.com/profile/${user_id}`,
