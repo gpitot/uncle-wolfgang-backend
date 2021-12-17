@@ -1,22 +1,23 @@
 module.exports = {
   env: {
     es6: true,
-    node: true
+    node: true,
+    jest: true,
   },
   extends: [
     "eslint:recommended",
     "plugin:import/errors",
-    "plugin:import/warnings"
+    "plugin:import/warnings",
   ],
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module"
+    sourceType: "module",
   },
   rules: {
     "linebreak-style": ["error", "unix"],
     quotes: ["error", "double"],
     semi: ["error", "always"],
     "import/no-commonjs": "error",
-    "no-console": 0
-  }
+    "no-console": 0,
+  },
 };

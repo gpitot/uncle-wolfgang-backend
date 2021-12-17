@@ -257,6 +257,7 @@ router.put(
         "player_1_games",
         "player_2_games",
         "accepted",
+        "declined",
       ],
       req.body,
       res,

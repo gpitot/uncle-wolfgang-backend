@@ -6,8 +6,8 @@ CREATE TABLE users (
     lastname VARCHAR(30) NOT NULL,
     photo VARCHAR(200),
     phone VARCHAR(15),
-    role VARCHAR(20) DEFAULT 'customer'
-    streak integer default 0
+    role VARCHAR(20) DEFAULT 'customer',
+    streak integer default 0,
     vaccinated BOOLEAN not null DEFAULT FALSE
 );
 
