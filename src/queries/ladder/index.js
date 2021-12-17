@@ -40,6 +40,7 @@ const getMatches = ({
                LADDER_MATCHES.player_2_paid,
                LADDER_MATCHES.approved,
                LADDER_MATCHES.accepted,
+               LADDER_MATCHES.declined,
 
                player_1_users.firstname as player_1_firstname,
                player_1_users.lastname  as player_1_lastname,
