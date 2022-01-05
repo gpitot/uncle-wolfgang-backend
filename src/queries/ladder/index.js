@@ -757,7 +757,8 @@ const getUsersWhoPlayedSinceDate = async (date, ladder_id) => {
         from LADDER_MATCHES
         where match_date > $1
           and match_date < $2
-          and ladder_id = $3`;
+          and ladder_id = $3
+          and approved = true`;
   try {
     const { rows } = await query(sql, [date, Date.now(), ladder_id]);
     const userSet = new Set();
@@ -774,6 +775,8 @@ const getUsersWhoPlayedSinceDate = async (date, ladder_id) => {
 };
 
 const updateUserRank = async (ladder_id, user, rank, isDemoted) => {
+  console.log("updateUserRank called", user, rank);
+  // return Promise.resolve();
   const args = [rank, ladder_id, user];
 
   let sql = `
@@ -793,6 +796,82 @@ const updateUserRank = async (ladder_id, user, rank, isDemoted) => {
      `;
 
   await query(sql, args);
+};
+
+const demoteUsersWhoAreInactive = async (ladder_id, activeUsers, ranks) => {
+  // go from top down, find any inactive user who has not been demoted recently and
+  // find the first next player who is also inactive, place them above that player
+  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 7; // 7 days
+  const CURRENT_TIME = Date.now();
+  const promises = [];
+
+  for (let i = 0; i < ranks.length; i += 1) {
+    const { id, firstname, last_demoted, phone } = ranks[i];
+    if (
+      !activeUsers.has(id) &&
+      last_demoted < CURRENT_TIME - MIN_TIME_BETWEEN_DEMOTIONS &&
+      i < ranks.length - 1
+    ) {
+      console.log("TARGET FOUND - ", firstname, "initial rank ", ranks[i].rank);
+      // we do not demote an inactive user if the next user is inactive also - skip this
+      if (i < ranks.length - 1) {
+        if (!activeUsers.has(ranks[i + 1].id)) {
+          console.log(
+            "NEVERMIND - ",
+            ranks[i + 1].firstname,
+            "is inactive also"
+          );
+          continue;
+        }
+      }
+
+      //we have our user
+      // find the placement
+
+      let targetFound = false;
+      let DEMOTED_RANK = 1;
+      let readableDemotedRank = 0;
+      for (let x = i + 1; x < ranks.length; x += 1) {
+        if (!activeUsers.has(ranks[x].id)) {
+          console.log(
+            "NEXT INACTIVE USER FOUND - ",
+            ranks[x].firstname,
+            "their rank ",
+            ranks[x].rank
+          );
+          // we have found our next inactive user, place the previous user above this one
+          DEMOTED_RANK =
+            ranks[x - 1].rank - (ranks[x - 1].rank - ranks[x].rank) / 2;
+          readableDemotedRank = x + 1;
+          targetFound = true;
+          break;
+        }
+      }
+      if (!targetFound) {
+        // got to end of list with no more inactive users , demote to bottom
+        console.log("NO TARGET FOUND GO TO BOTTOM - ");
+        DEMOTED_RANK = Math.max(
+          ranks[ranks.length - 1].rank / 2,
+          ranks[ranks.length - 1].rank - 1
+        );
+        readableDemotedRank = ranks.length;
+      }
+
+      console.log(
+        "-----user demoted",
+        id,
+        firstname,
+        readableDemotedRank,
+        DEMOTED_RANK,
+        phone
+      );
+      await updateUserRank(ladder_id, id, DEMOTED_RANK, true);
+      promises.push(
+        sendDemotionMessage(id, firstname, readableDemotedRank, phone)
+      );
+    }
+  }
+  return Promise.all(promises);
 };
 
 const iterateRanksAndUsersAndDemote = async (ladder_id, users, ranks) => {
@@ -873,7 +952,7 @@ const demoteForInactivity = async ({ ladder_id }) => {
     );
     const ranks = await getPrivateRanks({ ladder_id });
 
-    return iterateRanksAndUsersAndDemote(ladder_id, users, ranks);
+    return demoteUsersWhoAreInactive(ladder_id, users, ranks);
   } catch (e) {
     console.log("reject ", e);
     return Promise.reject();
@@ -900,4 +979,6 @@ export {
   adminGetPendingResultsMatches,
   demoteForInactivity,
   iterateRanksAndUsersAndDemote,
+  demoteUsersWhoAreInactive,
+  updateUserRank,
 };

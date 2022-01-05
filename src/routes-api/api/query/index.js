@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
   // }
 
   const q = `
-    select * from shop;
+    select * from ladder_ranks order by rank desc
     `;
 
   //114
