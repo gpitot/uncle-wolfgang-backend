@@ -1,7 +1,11 @@
-import { demoteForInactivity } from "../queries/ladder";
+import { demoteForInactivity, getAlmostInactiveUsers } from "../queries/ladder";
 
 const demoteUsers = () => {
   return demoteForInactivity({ ladder_id: 1 });
 };
 
-export { demoteUsers };
+const warnUsersAboutIncomingDemotion = () => {
+  return getAlmostInactiveUsers(1);
+};
+
+export { demoteUsers, warnUsersAboutIncomingDemotion };

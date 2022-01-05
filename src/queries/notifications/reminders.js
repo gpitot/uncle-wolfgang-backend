@@ -50,5 +50,8 @@ export default {
     `Welcome to North Manly Squash club ${firstname}!\nSign up to the ladder league here https://northmanlysquash.com/competition\nSign up to social events here https://northmanlysquash.com/social`,
 
   "ladder-user-demoted": ({ firstname, new_rank }) =>
-    `Hey ${firstname} due to inactivity on the ladder league you have been demoted to ${new_rank}.\nChallenge someone at\nhttps://northmanlysquash.com/competition`,
+    `Hey ${firstname} due to inactivity on the ladder league you have been demoted to ${new_rank}.\nChallenge someone at\nhttps://northmanlysquash.com/competition\nYou will continue to be demoted until you play a match.`,
+
+  "ladder-user-demote-warning": ({ firstname }) =>
+    `Hey ${firstname} if you don't play a ladder match in the next 10 days you will become eligible for demotion!\nChallenge someone at\nhttps://northmanlysquash.com/competition`,
 };

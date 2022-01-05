@@ -5,6 +5,7 @@ import {
   addLadderChallengeResponseNotification,
   addLadderResultApprovedNotification,
   sendDemotionMessage,
+  sendDemotionWarningMessage,
 } from "../notifications";
 
 const getLadders = () => {
@@ -107,7 +108,8 @@ const getPrivateRanks = async ({ ladder_id }) => {
                         users.photo,
                         users.phone,
                         ladder_ranks.rank,
-                        ladder_ranks.last_demoted
+                        ladder_ranks.last_demoted,
+                        ladder_ranks.last_warned
                  from ladder_ranks
                           inner join users on ladder_ranks.user_id = users.id
                  where ladder_id = $1
@@ -801,7 +803,7 @@ const updateUserRank = async (ladder_id, user, rank, isDemoted) => {
 const demoteUsersWhoAreInactive = async (ladder_id, activeUsers, ranks) => {
   // go from top down, find any inactive user who has not been demoted recently and
   // find the first next player who is also inactive, place them above that player
-  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 7; // 7 days
+  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 14; // 7 days
   const CURRENT_TIME = Date.now();
   const promises = [];
 
@@ -874,64 +876,6 @@ const demoteUsersWhoAreInactive = async (ladder_id, activeUsers, ranks) => {
   return Promise.all(promises);
 };
 
-const iterateRanksAndUsersAndDemote = async (ladder_id, users, ranks) => {
-  const MIN_TIME_BETWEEN_DEMOTIONS = 1000 * 60 * 60 * 24 * 7; // 7 days
-  const CURRENT_TIME = Date.now();
-  let lastUserAvailableForDemotion = null;
-  let currentRankToSwap = null;
-  let actuallyDemoted = false;
-
-  const promises = [];
-
-  for (let i = 0; i < ranks.length; i += 1) {
-    const { id, rank, last_demoted } = ranks[i];
-
-    if (
-      !users.has(id) &&
-      last_demoted < CURRENT_TIME - MIN_TIME_BETWEEN_DEMOTIONS
-    ) {
-      // a new eligible user for demotion appears = send a text if there was a previous demotion
-      if (lastUserAvailableForDemotion && actuallyDemoted) {
-        promises.push(
-          sendDemotionMessage(
-            lastUserAvailableForDemotion.id,
-            lastUserAvailableForDemotion.firstname,
-            i,
-            lastUserAvailableForDemotion.phone
-          )
-        );
-      }
-
-      actuallyDemoted = false;
-      lastUserAvailableForDemotion = ranks[i];
-      currentRankToSwap = ranks[i].rank;
-      continue;
-    }
-
-    if (lastUserAvailableForDemotion === null) {
-      // first user cannot go higher rank, user cannot swap up if the user above does not quality for demotion
-      continue;
-    }
-
-    // if we reach here then the user is eligible for promotion
-    // because users contains this id
-    // and because lastUserAvailableForDemotion is not null
-    if (users.has(id)) {
-      await updateUserRank(ladder_id, id, currentRankToSwap, false);
-      await updateUserRank(
-        ladder_id,
-        lastUserAvailableForDemotion.id,
-        rank,
-        true
-      );
-      actuallyDemoted = true;
-      currentRankToSwap = rank;
-    }
-  }
-
-  return Promise.all(promises);
-};
-
 /*
   get all matches played in the last week
   get all users from these matches
@@ -959,6 +903,48 @@ const demoteForInactivity = async ({ ladder_id }) => {
   }
 };
 
+const updateLastWarned = (id, epoch) => {
+  const sql = `
+  UPDATE LADDER_RANKS
+  set last_warned = $2
+    where user_id = $1
+  `;
+  return query(sql, [epoch, id]);
+};
+
+const getAlmostInactiveUsers = async (ladder_id) => {
+  const MAX_INACTIVE_TIME = 1000 * 60 * 60 * 24 * 20; // 20 days
+  const CURRENT_TIME = Date.now();
+  const TIME_BETWEEN_WARNINGS = CURRENT_TIME - 1000 * 60 * 60 * 24 * 10; // 10 days
+  try {
+    const users = await getUsersWhoPlayedSinceDate(
+      CURRENT_TIME - MAX_INACTIVE_TIME,
+      ladder_id
+    );
+    // get all users
+    // filter by active users and people who have been demoted in the last 20 days
+    const ranks = await getPrivateRanks({ ladder_id });
+    const promises = [];
+    for (const rank of ranks) {
+      if (
+        !users.has(rank.id) &&
+        rank.last_demoted < CURRENT_TIME - MAX_INACTIVE_TIME &&
+        rank.last_warned < TIME_BETWEEN_WARNINGS
+      ) {
+        promises.push(
+          sendDemotionWarningMessage(rank.id, rank.firstname, rank.phone)
+        );
+        // update last warned
+        promises.push(updateLastWarned(CURRENT_TIME, rank.id));
+      }
+    }
+    return Promise.all(promises);
+  } catch (e) {
+    console.log("reject ", e);
+    return Promise.reject();
+  }
+};
+
 export {
   getLadders,
   getMatches,
@@ -978,7 +964,7 @@ export {
   adminGetPendingBookingMatches,
   adminGetPendingResultsMatches,
   demoteForInactivity,
-  iterateRanksAndUsersAndDemote,
   demoteUsersWhoAreInactive,
   updateUserRank,
+  getAlmostInactiveUsers,
 };

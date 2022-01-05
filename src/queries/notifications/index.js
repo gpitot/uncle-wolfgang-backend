@@ -246,6 +246,13 @@ const sendDemotionMessage = (user_id, firstname, rank, phone) => {
   return sendMessage(message, phone, user_id);
 };
 
+const sendDemotionWarningMessage = (user_id, firstname, phone) => {
+  const message = REMINDERS["ladder-user-demote-warning"]({
+    firstname,
+  });
+  return sendMessage(message, phone, user_id);
+};
+
 const sendWelcomeMessage = (user_id, firstname, phone) => {
   const message = REMINDERS["welcome-new-user"]({ firstname });
   sendMessage(message, phone, user_id);
@@ -263,4 +270,5 @@ export {
   sendGroupMessage,
   sendDemotionMessage,
   sendWelcomeMessage,
+  sendDemotionWarningMessage,
 };

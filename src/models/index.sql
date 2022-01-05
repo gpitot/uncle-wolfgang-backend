@@ -78,6 +78,7 @@ CREATE TABLE LADDER_RANKS (
     rank decimal not null,
     recent_change integer default 0,
     last_demoted bigint default 0,
+    last_warned bigint default 0,
     UNIQUE (ladder_id, user_id)
 );
 
