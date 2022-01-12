@@ -566,6 +566,7 @@ const getAwaitingResults = ({ userid }) => {
                 or
                 player_2_users.id = $1
             )
+          AND declined = false
           AND approved = false
           AND MATCH_DATE < $2
           AND player_1_games is null;
