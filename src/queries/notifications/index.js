@@ -103,8 +103,8 @@ const addLadderResultApprovedNotification = async (
       winner_firstname
     );
   } else {
-    const new_winner_rank = getRankExtension(loser_rank); //0 index
-    const new_loser_rank = getRankExtension(loser_rank + 1);
+    const new_winner_rank = getRankExtension(loser_rank + 1); //0 index
+    const new_loser_rank = getRankExtension(loser_rank + 2);
     winnerMessage = REMINDERS["ladder-match-winner-changed"](
       winner_firstname,
       loser_firstname,
