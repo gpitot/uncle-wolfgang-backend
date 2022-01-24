@@ -4,9 +4,11 @@ import config from "config";
 import cors from "cors";
 import http from "http";
 import expressSession from "express-session";
-import apiRouter from "./routes-api";
+import { Server } from "socket.io";
 // eslint-disable-next-line import/no-commonjs
 require("dotenv").config();
+
+import { registerSetup } from "./sockets";
 
 const { SESSION_SECRET } = process.env;
 
@@ -36,13 +38,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     credentials: true,
-    origin: [
-      "http://localhost:3001",
-    ],
+    origin: ["http://localhost:3001"],
   })
 );
 
-app.use("/api", apiRouter);
+const io = new Server(server, {
+  /* options */
+});
+// https://socket.io/docs/v3/server-application-structure/
+io.on("connection", (socket) => {
+  registerSetup(io, socket);
+});
 
 export { server };
 export default app;
